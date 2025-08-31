@@ -1,0 +1,14 @@
+server:
+  port: 10022
+
+spring:
+  application:
+    name: graph-chatflow-example
+
+  ai:
+    openai:
+      base-url: ${MODEL_SCOPE_BASE_URL}
+      api-key: ${MODEL_SCOPE_API_KEY}
+      chat:
+        options:
+          model: ${MODEL_SCOPE_MODEL}

@@ -18,6 +18,7 @@
         <module>spring-ai-observability</module>
         <module>spring-ai-mcp</module>
         <module>spring-ai-nacos</module>
+        <module>graph-example</module>
     </modules>
 
     <name>Spring AI</name>

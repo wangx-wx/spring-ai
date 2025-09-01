@@ -52,7 +52,7 @@ public class TodoChatFlowFactory {
         // 闲聊/多轮通用LLM - Lambda 动态 new llmNode
         mainGraph.addNode("chat", node_async(state -> {
             LlmNode node = LlmNode.builder()
-                    .userPromptTemplate("${user_input}")
+                    .userPromptTemplate("{user_input}")
                     .params(Map.of("user_input", "null"))
                     .outputKey("chat_reply")
                     .chatClient(chatClient)
@@ -64,7 +64,7 @@ public class TodoChatFlowFactory {
         QuestionClassifierNode intentClassifier = QuestionClassifierNode.builder()
                 .chatClient(chatClient)
                 .inputTextKey("user_input")
-                .categories(List.of("创建待办", "其他"))
+                .categories(List.of("创建待办", "其它"))
                 .classificationInstructions(List.of("判断用户是否想创建一个待办事项。如果是，返回'创建待办'，否则返回'其它'"))
                 .outputKey("intent_type")
                 .build();
@@ -90,14 +90,12 @@ public class TodoChatFlowFactory {
                 if (createdTaskObj instanceof String s) {
                     createdTask = s;
                 } else if (createdTaskObj instanceof AssistantMessage am) {
-                    createdTask = am.toString();
+                    createdTask = am.getText();
                 } else if (createdTaskObj != null) {
                     createdTask = createdTaskObj.toString();
                 }
-
                 List<String> tasks = (List<String>) state.value("tasks").orElse(new ArrayList<>());
                 tasks = new ArrayList<>(tasks);
-
                 if (createdTask != null && !createdTask.isBlank()) {
                     tasks.add(createdTask);
                 }
@@ -114,7 +112,7 @@ public class TodoChatFlowFactory {
         mainGraph.addNode("mainReply", node_async(mainReply));
 
         mainGraph.addEdge(StateGraph.START, "intent");
-        // intent_type判定：如果为“创建待办”则进入子图，否则普通闲聊
+        // intent_type判定：如果为"创建待办"则进入子图，否则普通闲聊
         mainGraph.addConditionalEdges("intent", edge_async(state -> {
             String intentRaw = (String) state.value("intent_type").orElse("");
             String intent = intentRaw;

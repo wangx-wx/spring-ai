@@ -14,6 +14,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>01-chatflow</module>
+        <module>03-writing-assistant</module>
     </modules>
 
     <properties>

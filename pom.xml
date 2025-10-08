@@ -40,7 +40,7 @@
         <!-- Spring AI Alibaba -->
 <!--        <spring-ai-alibaba.version>1.0.0.2</spring-ai-alibaba.version>-->
 <!--        <spring-ai-alibaba.version>1.0.0.3-SNAPSHOT</spring-ai-alibaba.version>-->
-        <spring-ai-alibaba.version>1.0.0.3</spring-ai-alibaba.version>
+        <spring-ai-alibaba.version>1.0.0.4</spring-ai-alibaba.version>
 
         <!-- Spring Boot -->
         <spring-boot.version>3.4.6</spring-boot.version>

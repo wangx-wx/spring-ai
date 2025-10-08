@@ -12,8 +12,10 @@
 
     <artifactId>graph-example</artifactId>
     <packaging>pom</packaging>
+    <version>${revision}</version>
     <modules>
         <module>01-chatflow</module>
+        <module>02-human-node</module>
         <module>03-writing-assistant</module>
     </modules>
 

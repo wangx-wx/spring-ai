@@ -54,15 +54,15 @@ public class WritingAssistantConfig {
         StateGraph stateGraph = new StateGraph(keyStrategyFactory)
                 .addNode("summarizer", node_async(new SummarizerNode(chatClient)))
                 .addNode("feedback_classifier", node_async(new SummaryFeedbackClassifierNode(chatClient, "summary")))
-                .addNode("reworded", node_async(new RewordingNode(chatClient)))
+                .addNode("reworder", node_async(new RewordingNode(chatClient)))
                 .addNode("title_generator", node_async(new TitleGeneratorNode(chatClient)));
 
         // 节点连接
         stateGraph.addEdge(START, "summarizer")
-                .addEdge("summary", "feedback_classifier")
+                .addEdge("summarizer", "feedback_classifier")
                 .addConditionalEdges("feedback_classifier", edge_async(new FeedbackDispatcher()),
                         Map.of("positive", "reworder", "negative", "summarizer"))
-                .addEdge("reworded", "title_generator")
+                .addEdge("reworder", "title_generator")
                 .addEdge("title_generator", END);
 
         logger.info("WritingAssistantGraph PlantUML 打印开始");

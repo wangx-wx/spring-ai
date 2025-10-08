@@ -17,6 +17,7 @@
         <module>01-chatflow</module>
         <module>02-human-node</module>
         <module>03-writing-assistant</module>
+        <module>04-product-analysis</module>
     </modules>
 
     <properties>

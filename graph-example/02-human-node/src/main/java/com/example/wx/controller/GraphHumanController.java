@@ -7,7 +7,7 @@ import com.alibaba.cloud.ai.graph.RunnableConfig;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.async.AsyncGenerator;
 import com.alibaba.cloud.ai.graph.checkpoint.config.SaverConfig;
-import com.alibaba.cloud.ai.graph.checkpoint.constant.SaverConstant;
+import com.alibaba.cloud.ai.graph.checkpoint.constant.SaverEnum;
 import com.alibaba.cloud.ai.graph.checkpoint.savers.MemorySaver;
 import com.alibaba.cloud.ai.graph.exception.GraphRunnerException;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
@@ -40,7 +40,7 @@ public class GraphHumanController {
 
     public GraphHumanController(@Qualifier("humanGraph") StateGraph stateGraph) throws GraphStateException {
         SaverConfig saverConfig = SaverConfig.builder()
-                .register(SaverConstant.MEMORY, new MemorySaver())
+                .register(SaverEnum.MEMORY.getValue(), new MemorySaver())
                 .build();
 
         this.compiledGraph = stateGraph

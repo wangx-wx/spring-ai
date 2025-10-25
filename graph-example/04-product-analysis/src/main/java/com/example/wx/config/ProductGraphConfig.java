@@ -3,11 +3,14 @@ package com.example.wx.config;
 import com.alibaba.cloud.ai.graph.GraphRepresentation;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactoryBuilder;
+import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
+import com.alibaba.cloud.ai.graph.state.AgentStateFactory;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
 import com.example.wx.model.Product;
+import com.example.wx.serializer.ProductStateSerializer;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,6 +38,10 @@ public class ProductGraphConfig {
                 .addPatternStrategy("finalProduct", new ReplaceStrategy())
                 .build();
 
+        // Create custom serializer to handle Product object serialization
+        AgentStateFactory<OverAllState> stateFactory = OverAllState::new;
+        ProductStateSerializer serializer = new ProductStateSerializer(stateFactory);
+
         NodeAction marketingCopyNode = state -> {
             String productDesc = (String) state.value("productDesc").orElseThrow();
             String slogan = client.prompt()
@@ -61,7 +68,7 @@ public class ProductGraphConfig {
             return Map.of("finalProduct", finalProduct);
         };
 
-        StateGraph graph = new StateGraph("ProductAnalysisGraph", keyStrategyFactory);
+        StateGraph graph = new StateGraph("ProductAnalysisGraph", keyStrategyFactory, serializer);
         graph.addNode("marketingCopy", node_async(marketingCopyNode))
                 .addNode("specificationExtraction", node_async(specificationExtractionNode))
                 .addNode("merge", node_async(mergeNode))

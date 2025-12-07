@@ -2,6 +2,7 @@ package com.example.wx.controller;
 
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
+import com.alibaba.cloud.ai.dashscope.spec.DashScopeModel;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -34,10 +35,10 @@ public class DashScopeChatModelController {
      */
     @GetMapping("/simple/chat")
     public String simpleChat() {
-
         return dashScopeChatModel.call(new Prompt(DEFAULT_PROMPT, DashScopeChatOptions
                 .builder()
-                .withModel(DashScopeApi.ChatModel.QWEN_PLUS.getName())
+                .withModel(DashScopeModel.ChatModel.DEEPSEEK_V3_1.getName())
+                .withIncrementalOutput(false)
                 .build())).getResult().getOutput().getText();
     }
 
@@ -53,7 +54,7 @@ public class DashScopeChatModelController {
 
         Flux<ChatResponse> stream = dashScopeChatModel.stream(new Prompt(DEFAULT_PROMPT, DashScopeChatOptions
                 .builder()
-                .withModel(DashScopeApi.ChatModel.QWEN_PLUS.getName())
+                .withModel(DashScopeModel.ChatModel.QWEN_PLUS.getName())
                 .build()));
         return stream.map(resp -> resp.getResult().getOutput().getText());
     }

@@ -1,0 +1,137 @@
+package com.example.wx.config;
+
+import com.alibaba.cloud.ai.graph.CompileConfig;
+import com.alibaba.cloud.ai.graph.CompiledGraph;
+import com.alibaba.cloud.ai.graph.GraphRepresentation;
+import com.alibaba.cloud.ai.graph.KeyStrategy;
+import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
+import com.alibaba.cloud.ai.graph.StateGraph;
+import com.alibaba.cloud.ai.graph.checkpoint.config.SaverConfig;
+import com.alibaba.cloud.ai.graph.checkpoint.savers.MemorySaver;
+import com.alibaba.cloud.ai.graph.exception.GraphStateException;
+import com.alibaba.cloud.ai.graph.state.strategy.AppendStrategy;
+import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
+import com.example.wx.dto.Result;
+import com.example.wx.node.InterruptableNodeAction;
+import com.example.wx.node.SlotNode;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.alibaba.cloud.ai.graph.StateGraph.END;
+import static com.alibaba.cloud.ai.graph.StateGraph.START;
+import static com.alibaba.cloud.ai.graph.action.AsyncEdgeAction.edge_async;
+import static com.alibaba.cloud.ai.graph.action.AsyncNodeAction.node_async;
+
+/**
+ * @author wangxiang
+ * @description
+ * @create 2025/12/7 21:47
+ */
+@Configuration
+public class SlotGraph {
+    @Bean
+    public StateGraph slotAnalysisGraph(ChatModel chatModel) throws GraphStateException {
+
+        var slotNode = new SlotNode(chatModel);
+
+        var humanFeedback = new InterruptableNodeAction("human_feedback", "等待用户输入");
+
+        var step3 = node_async(state -> {
+            return Map.of("messages", "Step 3");
+        });
+
+        // 定义条件边：根据 human_feedback 的值决定路由
+        var evalHumanFeedback = edge_async(state -> {
+            var slotParams = state.value("slot_params", Result.class).get();
+            return "1".equals(slotParams.status()) ? "back" : "next";
+        });
+
+        // 配置 KeyStrategyFactory
+        KeyStrategyFactory keyStrategyFactory = () -> {
+            HashMap<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
+            keyStrategyHashMap.put("messages", new AppendStrategy());
+            keyStrategyHashMap.put("user_query", new ReplaceStrategy());
+            keyStrategyHashMap.put("nowData", new ReplaceStrategy());
+            keyStrategyHashMap.put("nowDay", new ReplaceStrategy());
+            keyStrategyHashMap.put("history", new ReplaceStrategy());
+            keyStrategyHashMap.put("slot_params", new ReplaceStrategy());
+            return keyStrategyHashMap;
+        };
+
+        StateGraph graph = new StateGraph(keyStrategyFactory);
+
+        graph.addNode("slot", node_async(slotNode))
+                .addNode("human_feedback", humanFeedback)
+                .addNode("step_3", step3)
+                .addEdge(START, "slot")
+                .addEdge("slot", "human_feedback")
+                .addConditionalEdges("human_feedback", evalHumanFeedback, Map.of("back", "slot", "next", "step_3"))
+                .addEdge("step_3", END);
+        GraphRepresentation representation = graph.getGraph(GraphRepresentation.Type.PLANTUML, "Product Analysis Graph");
+        System.out.println("\n=== Product Analysis Graph UML Flow ===");
+        System.out.println(representation.content());
+        System.out.println("======================================\n");
+        return graph;
+    }
+
+    @Bean
+    public CompiledGraph createGraphWithInterrupt() throws GraphStateException {
+        // 定义普通节点
+        var step1 = node_async(state -> {
+            return Map.of("messages", "Step 1");
+        });
+
+        // 定义可中断节点（实现 InterruptableAction）
+        var humanFeedback = new InterruptableNodeAction("human_feedback", "等待用户输入");
+
+        var step3 = node_async(state -> {
+            return Map.of("messages", "Step 3");
+        });
+
+        // 定义条件边：根据 human_feedback 的值决定路由
+        var evalHumanFeedback = edge_async(state -> {
+            var feedback = (String) state.value("human_feedback").orElse("unknown");
+            return (feedback.equals("next") || feedback.equals("back")) ? feedback : "unknown";
+        });
+
+        // 配置 KeyStrategyFactory
+        KeyStrategyFactory keyStrategyFactory = () -> {
+            HashMap<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
+            keyStrategyHashMap.put("messages", new AppendStrategy());
+            keyStrategyHashMap.put("human_feedback", new ReplaceStrategy());
+            return keyStrategyHashMap;
+        };
+
+        // 构建 Graph
+        StateGraph builder = new StateGraph(keyStrategyFactory)
+                .addNode("step_1", step1)
+                .addNode("human_feedback", humanFeedback)  // 使用可中断节点
+                .addNode("step_3", step3)
+                .addEdge(START, "step_1")
+                .addEdge("step_1", "human_feedback")
+                .addConditionalEdges("human_feedback", evalHumanFeedback,
+                        Map.of("back", "step_1", "next", "step_3", "unknown", "human_feedback"))
+                .addEdge("step_3", END);
+
+        GraphRepresentation representation = builder.getGraph(GraphRepresentation.Type.PLANTUML, "Product Analysis Graph");
+        System.out.println("+++++++++ Product Analysis Graph UML Flow ===");
+        System.out.println(representation.content());
+        System.out.println("+++++++++++++++++");
+
+        // 配置内存保存器（用于状态持久化）
+        var saver = new MemorySaver();
+
+        var compileConfig = CompileConfig.builder()
+                .saverConfig(SaverConfig.builder()
+                        .register(saver)
+                        .build())
+                // 不再需要 interruptBefore 配置，中断由 InterruptableAction 控制
+                .build();
+
+        return builder.compile(compileConfig);
+    }
+}

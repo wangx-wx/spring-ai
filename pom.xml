@@ -35,15 +35,16 @@
         <maven.compiler.target>17</maven.compiler.target>
 
         <!-- Spring AI -->
-        <spring-ai.version>1.0.0</spring-ai.version>
+        <spring-ai.version>1.1.0-M4</spring-ai.version>
 
         <!-- Spring AI Alibaba -->
 <!--        <spring-ai-alibaba.version>1.0.0.2</spring-ai-alibaba.version>-->
 <!--        <spring-ai-alibaba.version>1.0.0.3-SNAPSHOT</spring-ai-alibaba.version>-->
-        <spring-ai-alibaba.version>1.0.0.4</spring-ai-alibaba.version>
+        <spring-ai-alibaba.version>1.1.0.0-M5</spring-ai-alibaba.version>
+        <spring-ai-alibaba.extensions.version>1.1.0.0-M5</spring-ai-alibaba.extensions.version>
 
         <!-- Spring Boot -->
-        <spring-boot.version>3.4.6</spring-boot.version>
+        <spring-boot.version>3.5.7</spring-boot.version>
 
         <!-- DashScope SDK Version -->
         <dashscope-sdk-java.version>2.15.1</dashscope-sdk-java.version>
@@ -74,6 +75,13 @@
                 <groupId>org.springframework.ai</groupId>
                 <artifactId>spring-ai-bom</artifactId>
                 <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.cloud.ai</groupId>
+                <artifactId>spring-ai-alibaba-extensions-bom</artifactId>
+                <version>${spring-ai-alibaba.extensions.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

@@ -9,10 +9,16 @@ import com.alibaba.cloud.ai.graph.action.InterruptionMetadata;
 import com.alibaba.cloud.ai.graph.checkpoint.config.SaverConfig;
 import com.alibaba.cloud.ai.graph.checkpoint.savers.MemorySaver;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
+import com.alibaba.cloud.ai.graph.state.StateSnapshot;
+import com.example.wx.dto.GraphRequest;
+import com.example.wx.dto.Result;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,6 +32,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class TestController {
 
     private final CompiledGraph compiledGraph;
+    AtomicReference<NodeOutput> lastOutputRef = new AtomicReference<>();
 
     public TestController(@Qualifier("slotAnalysisGraph") StateGraph slotAnalysisGraph) throws GraphStateException {
         var saver = new MemorySaver();
@@ -35,6 +42,72 @@ public class TestController {
                         .build())
                 .build();
         this.compiledGraph = slotAnalysisGraph.compile(compileConfig);
+    }
+
+    @GetMapping("/call")
+    public Mono<String> call(GraphRequest request) {
+        var config = RunnableConfig.builder()
+                .threadId(request.threadId())
+                .build();
+
+        return getExecutionStream(request, config)
+                .last()
+                .map(output -> output.state().value("slot_params", Result.class).get().toString());
+    }
+
+    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> stream(GraphRequest request) {
+        var config = RunnableConfig.builder()
+                .threadId(request.threadId())
+                .build();
+
+        return getExecutionStream(request, config)
+                .last()
+                .map(output -> output.state().value("slot_params", Result.class).get().toString())
+                .flux(); // 转换为 Flux
+    }
+
+    private Flux<NodeOutput> startNewConversation(GraphRequest request, RunnableConfig config) {
+        Map<String, Object> initialState = Map.of(
+                "user_query", request.query()
+        );
+        return this.compiledGraph.stream(initialState, config).doOnNext(event -> {
+                    System.out.println("节点输出: " + event);
+                    lastOutputRef.set(event);
+                })
+                .doOnError(error -> System.err.println("流错误: " + error.getMessage()))
+                .doOnComplete(() -> System.out.println("流完成"));
+    }
+
+    private Flux<NodeOutput> getExecutionStream(GraphRequest request,
+                                                RunnableConfig config) {
+        return compiledGraph.stateOf(config)
+                .map(snapshot -> resumeFromCheckpoint(snapshot, request, config))
+                .orElseGet(() -> startNewConversation(request, config));
+    }
+
+    private Flux<NodeOutput> resumeFromCheckpoint(StateSnapshot snapshot, GraphRequest request, RunnableConfig config) {
+        String nextNode = snapshot.next();
+        if (nextNode == null || nextNode.isEmpty()) {
+            // 流程已完成,当新对话处理
+            return startNewConversation(request, config);
+        }
+        if ("human_feedback".equals(nextNode)) {
+            try {
+                this.compiledGraph.updateState(config, Map.of(
+                        "user_query", request.query()
+                ), null);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return this.compiledGraph.stream(null, config)
+                .doOnNext(event -> {
+                    System.out.println("节点输出: " + event);
+                    lastOutputRef.set(event);
+                })
+                .doOnError(error -> System.err.println("流错误: " + error.getMessage()))
+                .doOnComplete(() -> System.out.println("流完成"));
     }
 
     @GetMapping("/test")

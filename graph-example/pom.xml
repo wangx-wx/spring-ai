@@ -21,6 +21,7 @@
         <module>05-observability-langfuse</module>
         <module>06-slot-extraction</module>
         <module>07-memory-graph</module>
+        <module>08-intent-recognition</module>
     </modules>
 
     <properties>

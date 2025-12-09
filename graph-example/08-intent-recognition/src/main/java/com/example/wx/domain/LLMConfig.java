@@ -1,0 +1,37 @@
+package com.example.wx.domain;
+
+import lombok.Builder;
+import lombok.Data;
+import org.springframework.ai.chat.prompt.PromptTemplate;
+
+/**
+ * @author wangxiang
+ * @description
+ * @create 2025/12/9 22:16
+ */
+@Data
+@Builder
+public class LLMConfig {
+    @Builder.Default
+    private String queryKey = "query";
+
+    @Builder.Default
+    private String outputKey = "answer";
+
+    private String contextKey;
+
+    @Builder.Default
+    private String model = "qwen-max";
+
+    @Builder.Default
+    private Double temperature = 0.7;
+
+    @Builder.Default
+    private Double topP = 0.8;
+
+    @Builder.Default
+    private Integer maxTokens = 2000;
+
+    @Builder.Default
+    private boolean includeMetadata = false;
+}

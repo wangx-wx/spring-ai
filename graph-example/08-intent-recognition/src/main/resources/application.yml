@@ -1,0 +1,10 @@
+server:
+  port: 10028
+
+spring:
+  application:
+    name: intent-recognition
+  ai:
+    dashscope:
+      api-key: ${DASH_SCOPE_API_KEY}
+      index-name: sit-意图语料库

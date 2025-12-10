@@ -1,10 +1,5 @@
 package com.example.wx.config;
 
-import static com.example.wx.constants.IntentGraphParams.HISTORY;
-import static com.example.wx.constants.IntentGraphParams.RAG_RESULT;
-import static com.example.wx.constants.IntentGraphParams.REWRITE_QUERY;
-import static com.example.wx.constants.IntentGraphParams.USER_QUERY;
-
 import com.alibaba.cloud.ai.dashscope.rag.DashScopeDocumentRetriever;
 import com.alibaba.cloud.ai.dashscope.spec.DashScopeModel;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
@@ -16,12 +11,6 @@ import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
 import com.example.wx.config.node.LLMNode;
 import com.example.wx.config.node.RagNode;
 import com.example.wx.domain.LLMConfig;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatModel;
@@ -30,6 +19,23 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StreamUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.example.wx.constants.IntentGraphParams.CLARIFY_LIST;
+import static com.example.wx.constants.IntentGraphParams.HISTORY;
+import static com.example.wx.constants.IntentGraphParams.INTENT_RESULT;
+import static com.example.wx.constants.IntentGraphParams.NOW_DATE;
+import static com.example.wx.constants.IntentGraphParams.RAG_RESULT;
+import static com.example.wx.constants.IntentGraphParams.REWRITE_QUERY;
+import static com.example.wx.constants.IntentGraphParams.USER_QUERY;
+import static com.example.wx.constants.IntentGraphParams.WEEK_DAY;
+import static com.example.wx.constants.IntentGraphParams.WEEK_OF_YEAR;
 
 /**
  * @author wangxiang
@@ -50,18 +56,20 @@ public class IntentRecognitionGraph {
 
     @Bean
     public StateGraph stateGraphIntentRecognition(ChatModel chatModel,
-            DashScopeDocumentRetriever dashScopeDocumentRetriever) throws GraphStateException {
+                                                  DashScopeDocumentRetriever dashScopeDocumentRetriever) throws GraphStateException {
         KeyStrategyFactory keyStrategyFactoryBuilder = new KeyStrategyFactoryBuilder()
                 .addPatternStrategy(HISTORY, new AppendStrategy())
                 .addPatternStrategy(USER_QUERY, new ReplaceStrategy())
                 .addPatternStrategy(REWRITE_QUERY, new ReplaceStrategy())
+                .addPatternStrategy(INTENT_RESULT, new ReplaceStrategy())
+                .addPatternStrategy(NOW_DATE, new ReplaceStrategy())
+                .addPatternStrategy(WEEK_DAY, new ReplaceStrategy())
+                .addPatternStrategy(WEEK_OF_YEAR, new ReplaceStrategy())
                 .build();
 
         // 问题重写节点
         var rewriteNode = new LLMNode(chatModel, LLMConfig.builder()
-                .topP(0.7)
                 .systemPrompt(resourceToString(rewritePrompt))
-                .temperature(0.5)
                 .sysParams(new HashMap<>(Map.of(HISTORY, List.of())))
                 .model(DashScopeModel.ChatModel.DEEPSEEK_V3_1.value)
                 .queryKey(USER_QUERY)
@@ -73,16 +81,22 @@ public class IntentRecognitionGraph {
 
         // 意图识别节点
         var intentNode = new LLMNode(chatModel, LLMConfig.builder()
-                .topP(0.7)
                 .systemPrompt(resourceToString(intentPrompt))
-                .temperature(0.5)
                 .model(DashScopeModel.ChatModel.DEEPSEEK_V3_1.value)
-                .queryKey("user_query")
-                .userParams(new HashMap<>(Map.of("nowDate", "", "weekDay", "", "weekOfYear", "")))
-                .outputKey("intent_result")
+                .queryKey(USER_QUERY)
+                .userParams(new HashMap<>(Map.of(NOW_DATE, "", WEEK_DAY, "", WEEK_OF_YEAR, "")))
+                .outputKey(INTENT_RESULT)
                 .build());
 
         // 槽位提取
+        var slotNode = new LLMNode(chatModel, LLMConfig.builder()
+                .systemPrompt("")
+                .queryKey(CLARIFY_LIST)
+                .model(DashScopeModel.ChatModel.DEEPSEEK_V3_1.value)
+                .structuredOutput(true)
+                .build());
+
+        //
         return null;
     }
 

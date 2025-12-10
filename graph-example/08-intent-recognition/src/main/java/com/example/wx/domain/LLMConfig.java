@@ -46,10 +46,10 @@ public class LLMConfig {
     private String model = "qwen-max";
 
     @Builder.Default
-    private Double temperature = 0.7;
+    private Double temperature = 0.5;
 
     @Builder.Default
-    private Double topP = 0.8;
+    private Double topP = 0.7;
 
     @Builder.Default
     private boolean includeMetadata = false;

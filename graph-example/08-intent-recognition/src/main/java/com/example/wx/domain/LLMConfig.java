@@ -1,8 +1,9 @@
 package com.example.wx.domain;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.ai.chat.prompt.PromptTemplate;
 
 /**
  * @author wangxiang
@@ -12,13 +13,18 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 @Data
 @Builder
 public class LLMConfig {
+
     @Builder.Default
-    private String queryKey = "query";
+    private String queryKey = "user_query";
 
     @Builder.Default
     private String outputKey = "answer";
 
-    private String contextKey;
+    @Builder.Default
+    private Map<String, Object> params = new HashMap<>();
+
+    @Builder.Default
+    private String systemPrompt = "you are a helpful assistant";
 
     @Builder.Default
     private String model = "qwen-max";
@@ -28,9 +34,6 @@ public class LLMConfig {
 
     @Builder.Default
     private Double topP = 0.8;
-
-    @Builder.Default
-    private Integer maxTokens = 2000;
 
     @Builder.Default
     private boolean includeMetadata = false;

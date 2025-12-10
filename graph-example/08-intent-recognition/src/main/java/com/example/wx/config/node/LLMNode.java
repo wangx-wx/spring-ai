@@ -7,6 +7,7 @@ import com.example.wx.domain.LLMConfig;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AbstractMessage;
@@ -25,17 +26,23 @@ import org.springframework.ai.chat.model.Generation;
 public class LLMNode implements NodeAction {
 
     private final ChatModel chatModel;
-    private final String systemPrompt;
     private final LLMConfig llmConfig;
 
     @Override
     public Map<String, Object> apply(OverAllState state) throws Exception {
         ChatClient chatClient = ChatClient.builder(chatModel)
                 .defaultOptions(buildOptions())
-                .defaultSystem(systemPrompt)
+                .defaultSystem(llmConfig.getSystemPrompt())
                 .build();
+        Set<String> paramKey = llmConfig.getParams().keySet();
+        for (String key : paramKey) {
+            llmConfig.getParams().put(key, state.value(key).orElse( ""));
+        }
         String query = state.value(llmConfig.getQueryKey(), "");
-        Optional<ChatResponse> chatResponse = Optional.ofNullable(chatClient.prompt().user(query).call().chatResponse());
+        Optional<ChatResponse> chatResponse = Optional.ofNullable(chatClient.prompt()
+                .user(query)
+                .system(s-> s.params(llmConfig.getParams()))
+                .call().chatResponse());
         Map<String, Object> result = new HashMap<>();
         String answer = chatResponse.map(ChatResponse::getResult)
                 .map(Generation::getOutput)
@@ -58,7 +65,6 @@ public class LLMNode implements NodeAction {
                 .model(llmConfig.getModel())
                 .temperature(llmConfig.getTemperature())
                 .topP(llmConfig.getTopP())
-                .maxToken(llmConfig.getMaxTokens())
                 .build();
     }
 

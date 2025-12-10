@@ -4,6 +4,9 @@ import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
 import com.example.wx.domain.LLMConfig;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AbstractMessage;
@@ -12,10 +15,6 @@ import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author wangxiang
@@ -56,10 +55,10 @@ public class LLMNode implements NodeAction {
 
     private DashScopeChatOptions buildOptions() {
         return DashScopeChatOptions.builder()
-                .withModel(llmConfig.getModel())
-                .withTemperature(llmConfig.getTemperature())
-                .withTopP(llmConfig.getTopP())
-                .withMaxToken(llmConfig.getMaxTokens())
+                .model(llmConfig.getModel())
+                .temperature(llmConfig.getTemperature())
+                .topP(llmConfig.getTopP())
+                .maxToken(llmConfig.getMaxTokens())
                 .build();
     }
 

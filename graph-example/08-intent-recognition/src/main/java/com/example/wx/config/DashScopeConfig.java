@@ -30,9 +30,8 @@ public class DashScopeConfig {
         return new DashScopeDocumentRetriever(
                 dashScopeApi,
                 DashScopeDocumentRetrieverOptions.builder()
-                        .withIndexName(indexName)
-                        .withRerankTopN(8)
-                        .withEnableReranking(true)
+                        .indexName(indexName)
+                        .rerankTopN(8)
                         .build()
         );
     }

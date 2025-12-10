@@ -1,5 +1,10 @@
 package com.example.wx.config;
 
+import static com.example.wx.constants.IntentGraphParams.HISTORY;
+import static com.example.wx.constants.IntentGraphParams.RAG_RESULT;
+import static com.example.wx.constants.IntentGraphParams.REWRITE_QUERY;
+import static com.example.wx.constants.IntentGraphParams.USER_QUERY;
+
 import com.alibaba.cloud.ai.dashscope.rag.DashScopeDocumentRetriever;
 import com.alibaba.cloud.ai.dashscope.spec.DashScopeModel;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
@@ -47,9 +52,9 @@ public class IntentRecognitionGraph {
     public StateGraph stateGraphIntentRecognition(ChatModel chatModel,
             DashScopeDocumentRetriever dashScopeDocumentRetriever) throws GraphStateException {
         KeyStrategyFactory keyStrategyFactoryBuilder = new KeyStrategyFactoryBuilder()
-                .addPatternStrategy("history_list", new AppendStrategy())
-                .addPatternStrategy("user_query", new ReplaceStrategy())
-                .addPatternStrategy("rewrite_query", new ReplaceStrategy())
+                .addPatternStrategy(HISTORY, new AppendStrategy())
+                .addPatternStrategy(USER_QUERY, new ReplaceStrategy())
+                .addPatternStrategy(REWRITE_QUERY, new ReplaceStrategy())
                 .build();
 
         // 问题重写节点
@@ -57,14 +62,14 @@ public class IntentRecognitionGraph {
                 .topP(0.7)
                 .systemPrompt(resourceToString(rewritePrompt))
                 .temperature(0.5)
-                .params(new HashMap<>(Map.of("history_list", List.of())))
+                .sysParams(new HashMap<>(Map.of(HISTORY, List.of())))
                 .model(DashScopeModel.ChatModel.DEEPSEEK_V3_1.value)
-                .queryKey("user_query")
-                .outputKey("rewrite_query")
+                .queryKey(USER_QUERY)
+                .outputKey(REWRITE_QUERY)
                 .build());
 
         // 语义召回节点
-        var ragNode = new RagNode("rag_list", "rewrite_query", dashScopeDocumentRetriever);
+        var ragNode = new RagNode(RAG_RESULT, REWRITE_QUERY, dashScopeDocumentRetriever);
 
         // 意图识别节点
         var intentNode = new LLMNode(chatModel, LLMConfig.builder()
@@ -73,7 +78,7 @@ public class IntentRecognitionGraph {
                 .temperature(0.5)
                 .model(DashScopeModel.ChatModel.DEEPSEEK_V3_1.value)
                 .queryKey("user_query")
-                .params(new HashMap<>(Map.of("nowDate", "", "weekDay", "", "weekOfYear", "")))
+                .userParams(new HashMap<>(Map.of("nowDate", "", "weekDay", "", "weekOfYear", "")))
                 .outputKey("intent_result")
                 .build());
 

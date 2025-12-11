@@ -30,4 +30,8 @@ public interface IntentGraphParams {
     // 第几周
     String WEEK_OF_YEAR = "week_of_year";
     String CLARIFY_LIST = "clarify_list";
+    String SLOT_PARAMS = "slot_params";
+
+
+    String NODE_ID = "node_id";
 }

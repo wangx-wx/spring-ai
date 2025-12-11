@@ -33,6 +33,7 @@ import static com.example.wx.constants.IntentGraphParams.INTENT_RESULT;
 import static com.example.wx.constants.IntentGraphParams.NOW_DATE;
 import static com.example.wx.constants.IntentGraphParams.RAG_RESULT;
 import static com.example.wx.constants.IntentGraphParams.REWRITE_QUERY;
+import static com.example.wx.constants.IntentGraphParams.SLOT_PARAMS;
 import static com.example.wx.constants.IntentGraphParams.USER_QUERY;
 import static com.example.wx.constants.IntentGraphParams.WEEK_DAY;
 import static com.example.wx.constants.IntentGraphParams.WEEK_OF_YEAR;
@@ -94,6 +95,7 @@ public class IntentRecognitionGraph {
                 .queryKey(CLARIFY_LIST)
                 .model(DashScopeModel.ChatModel.DEEPSEEK_V3_1.value)
                 .structuredOutput(true)
+                .outputKey(SLOT_PARAMS)
                 .build());
 
         //

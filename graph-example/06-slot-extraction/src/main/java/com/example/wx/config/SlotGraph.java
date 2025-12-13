@@ -9,6 +9,7 @@ import com.alibaba.cloud.ai.graph.state.strategy.AppendStrategy;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
 import com.example.wx.dto.Result;
 import com.example.wx.node.InterruptableNodeAction;
+import com.example.wx.node.SlotExtractionNode;
 import com.example.wx.node.SlotNode;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.context.annotation.Bean;
@@ -32,9 +33,15 @@ public class SlotGraph {
     @Bean
     public StateGraph slotAnalysisGraph(ChatModel chatModel) throws GraphStateException {
 
-        var slotNode = new SlotNode(chatModel);
 
-        var humanFeedback = new InterruptableNodeAction("human_feedback", "等待用户输入");
+        var step1 = node_async(state -> {
+            return Map.of("messages", "Step 1");
+        });
+
+        // var slotNode = new SlotNode(chatModel);
+        // var humanFeedback = new InterruptableNodeAction("human_feedback", "等待用户输入");
+
+        var slotExtractionNode = new SlotExtractionNode(chatModel);
 
         var step3 = node_async(state -> {
             return Map.of("messages", "Step 3");
@@ -60,12 +67,21 @@ public class SlotGraph {
 
         StateGraph graph = new StateGraph(keyStrategyFactory);
 
-        graph.addNode("slot", node_async(slotNode))
-                .addNode("human_feedback", humanFeedback)
+        // graph.addNode("slot", node_async(slotNode))
+        //         .addNode("human_feedback", humanFeedback)
+        //         .addNode("step_3", step3)
+        //         .addNode("step_1", step1)
+        //         .addEdge(START, "step_1")
+        //         .addEdge("step_1", "slot")
+        //         .addEdge("slot", "human_feedback")
+        //         .addConditionalEdges("human_feedback", evalHumanFeedback, Map.of("back", "slot", "next", "step_3"))
+        //         .addEdge("step_3", END);
+        graph.addNode("slot", slotExtractionNode)
                 .addNode("step_3", step3)
-                .addEdge(START, "slot")
-                .addEdge("slot", "human_feedback")
-                .addConditionalEdges("human_feedback", evalHumanFeedback, Map.of("back", "slot", "next", "step_3"))
+                .addNode("step_1", step1)
+                .addEdge(START, "step_1")
+                .addEdge("step_1", "slot")
+                .addConditionalEdges("slot", evalHumanFeedback, Map.of("back", "slot", "next", "step_3"))
                 .addEdge("step_3", END);
         GraphRepresentation representation = graph.getGraph(GraphRepresentation.Type.PLANTUML, "Product Analysis Graph");
         System.out.println("\n=== Product Analysis Graph UML Flow ===");

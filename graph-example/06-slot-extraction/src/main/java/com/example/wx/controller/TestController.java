@@ -52,7 +52,16 @@ public class TestController {
 
         return getExecutionStream(request, config)
                 .last()
-                .map(output -> output.state().value("slot_params", Result.class).get().toString());
+                .map(output -> {
+                    // 检查是否是中断
+                    if (output instanceof InterruptionMetadata interruption) {
+                        // 中断场景：从元数据获取 reply
+                        return (String) interruption.metadata("reply").orElse("请补充信息");
+                    }
+
+                    // 正常完成：从状态获取 reply
+                    return output.state().value("reply", String.class).orElse("完成");
+                });
     }
 
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -92,22 +101,20 @@ public class TestController {
             // 流程已完成,当新对话处理
             return startNewConversation(request, config);
         }
-        if ("human_feedback".equals(nextNode)) {
-            try {
-                this.compiledGraph.updateState(config, Map.of(
-                        "user_query", request.query()
-                ), null);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+        try {
+            RunnableConfig runnableConfig = this.compiledGraph.updateState(config, Map.of(
+                    "user_query", request.query()
+            ), null);
+            return this.compiledGraph.stream(null, runnableConfig)
+                    .doOnNext(event -> {
+                        System.out.println("节点输出: " + event);
+                        lastOutputRef.set(event);
+                    })
+                    .doOnError(error -> System.err.println("流错误: " + error.getMessage()))
+                    .doOnComplete(() -> System.out.println("流完成"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return this.compiledGraph.stream(null, config)
-                .doOnNext(event -> {
-                    System.out.println("节点输出: " + event);
-                    lastOutputRef.set(event);
-                })
-                .doOnError(error -> System.err.println("流错误: " + error.getMessage()))
-                .doOnComplete(() -> System.out.println("流完成"));
     }
 
     @GetMapping("/test")

@@ -5,6 +5,7 @@ import com.alibaba.cloud.ai.graph.RunnableConfig;
 import com.alibaba.cloud.ai.graph.action.AsyncNodeActionWithConfig;
 import com.alibaba.cloud.ai.graph.action.InterruptableAction;
 import com.alibaba.cloud.ai.graph.action.InterruptionMetadata;
+import com.alibaba.cloud.ai.graph.state.ReplaceAllWith;
 import com.example.wx.dto.Result;
 
 import java.util.Map;
@@ -28,6 +29,7 @@ public class InterruptableNodeAction implements AsyncNodeActionWithConfig, Inter
 
     @Override
     public CompletableFuture<Map<String, Object>> apply(OverAllState state, RunnableConfig config) {
+        System.out.println("state = " + state);
         // 正常节点逻辑：更新状态
         return CompletableFuture.completedFuture(Map.of("messages", message));
     }

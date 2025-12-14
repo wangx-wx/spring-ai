@@ -83,7 +83,7 @@ public class SlotGraph {
                 .addEdge("step_1", "slot")
                 .addConditionalEdges("slot", evalHumanFeedback, Map.of("back", "slot", "next", "step_3"))
                 .addEdge("step_3", END);
-        GraphRepresentation representation = graph.getGraph(GraphRepresentation.Type.PLANTUML, "Product Analysis Graph");
+        GraphRepresentation representation = graph.getGraph(GraphRepresentation.Type.MERMAID, "Product Analysis Graph");
         System.out.println("\n=== Product Analysis Graph UML Flow ===");
         System.out.println(representation.content());
         System.out.println("======================================\n");

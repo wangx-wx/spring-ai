@@ -34,4 +34,9 @@ public interface IntentGraphParams {
 
 
     String NODE_ID = "node_id";
+
+    // 回复变量
+    String REPLY = "reply";
+    // 恢复执行
+    String RESUME = "resume";
 }

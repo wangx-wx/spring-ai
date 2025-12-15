@@ -5,6 +5,8 @@ import com.alibaba.cloud.ai.dashscope.spec.DashScopeModel;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactoryBuilder;
 import com.alibaba.cloud.ai.graph.StateGraph;
+import com.alibaba.cloud.ai.graph.action.AsyncNodeAction;
+import com.alibaba.cloud.ai.graph.agent.ReactAgent;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
 import com.alibaba.cloud.ai.graph.state.strategy.AppendStrategy;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
@@ -27,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.alibaba.cloud.ai.graph.action.AsyncNodeAction.node_async;
 import static com.example.wx.constants.IntentGraphParams.CLARIFY_LIST;
 import static com.example.wx.constants.IntentGraphParams.HISTORY;
 import static com.example.wx.constants.IntentGraphParams.INTENT_RESULT;
@@ -98,7 +101,17 @@ public class IntentRecognitionGraph {
                 .outputKey(SLOT_PARAMS)
                 .build());
 
-        //
+        // 知识库问答节点
+        var knowledgeNode = node_async(state -> {
+            // todo 知识库问答
+            return Map.of();
+        });
+
+        ReactAgent reactAgent =ReactAgent.builder()
+                .model(chatModel)
+                .outputKey("output")
+                .systemPrompt("")
+                .build();
         return null;
     }
 

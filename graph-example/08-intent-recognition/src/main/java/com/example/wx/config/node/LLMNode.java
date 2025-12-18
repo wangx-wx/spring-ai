@@ -1,19 +1,24 @@
 package com.example.wx.config.node;
 
-import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
-import com.example.wx.domain.LLMConfig;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AbstractMessage;
-import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.chat.prompt.SystemPromptTemplate;
+import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * 通用 LLM 调用节点
@@ -31,23 +36,52 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 @AllArgsConstructor
 public class LLMNode implements NodeAction {
 
-    private final ChatModel chatModel;
-    private final LLMConfig llmConfig;
+    private ChatClient chatClient;
+    private ChatOptions chatOptions;
+    //
+    private String inputKey;
+    private String outputKey;
+    private String systemPrompt;
+    private Map<String, Object> sysParams;
+    private String userPrompt;
+    private Map<String, Object> userParams;
+    private String outputSchema;
+    private String outputPackage;
+
+    public LLMNode(Builder builder) {
+        this.chatClient = builder.chatClient;
+        this.chatOptions = builder.chatOptions;
+        this.inputKey = builder.inputKey;
+        this.outputKey = builder.outputKey;
+        this.systemPrompt = builder.systemPrompt;
+        this.sysParams = builder.sysParams;
+        this.userPrompt = builder.userPrompt;
+        this.userParams = builder.userParams;
+        this.outputSchema = builder.outputSchema;
+        this.outputPackage = builder.outputPackage;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
 
     @Override
     public Map<String, Object> apply(OverAllState state) throws Exception {
-        ChatClient chatClient = ChatClient.builder(chatModel)
-                .defaultOptions(buildOptions())
-                .build();
 
+
+        List<Message> messageList = new ArrayList<>();
         // 渲染 system 和 user 消息模板
-        String systemMessage = renderSystemPrompt(state);
-        String userMessage = renderUserPrompt(state);
+        renderSystemPrompt(state, messageList);
+        renderUserPrompt(state, messageList);
+
+        Optional<String> value = state.value(this.inputKey, String.class);
+        value.ifPresent(s -> messageList.add(new UserMessage(s)));
 
         // 调用 LLM
-        var callResponse = chatClient.prompt()
-                .system(systemMessage)
-                .user(userMessage)
+        var callResponse = this.chatClient.prompt()
+                .messages(messageList)
+                .options(this.chatOptions)
                 .call();
 
         // 处理输出
@@ -60,12 +94,20 @@ public class LLMNode implements NodeAction {
      * 使用 {@link PromptTemplate} 将 sysParams 中定义的变量从 state 获取并替换到模板中
      *
      * @param state 全局状态
-     * @return 渲染后的 system prompt 字符串
      */
-    private String renderSystemPrompt(OverAllState state) {
-        Map<String, Object> params = resolveParams(llmConfig.getSysParams(), state);
-        PromptTemplate template = new PromptTemplate(llmConfig.getSystemPrompt());
-        return template.render(params);
+    private void renderSystemPrompt(OverAllState state, List<Message> messageList) {
+        if (!StringUtils.hasText(systemPrompt)) {
+            return;
+        }
+        SystemPromptTemplate template = new SystemPromptTemplate(systemPrompt);
+        Map<String, Object> params = resolveParams(this.sysParams, state);
+        Message message = null;
+        if (!params.isEmpty()) {
+            message = template.createMessage(params);
+        } else {
+            message = template.createMessage();
+        }
+        messageList.add(message);
     }
 
     /**
@@ -78,17 +120,20 @@ public class LLMNode implements NodeAction {
      * </ol>
      *
      * @param state 全局状态
-     * @return 渲染后的 user prompt 字符串
      */
-    private String renderUserPrompt(OverAllState state) {
-        if (llmConfig.getUserPrompt() != null) {
-            // 模板模式
-            Map<String, Object> params = resolveParams(llmConfig.getUserParams(), state);
-            PromptTemplate template = new PromptTemplate(llmConfig.getUserPrompt());
-            return template.render(params);
+    private void renderUserPrompt(OverAllState state, List<Message> messageList) {
+        if (!StringUtils.hasText(userPrompt)) {
+            return;
         }
-        // 简单模式：直接从 state 获取
-        return state.value(llmConfig.getQueryKey(), "");
+        PromptTemplate template = new PromptTemplate(userPrompt);
+        Map<String, Object> params = resolveParams(this.userParams, state);
+        Message message = null;
+        if (!params.isEmpty()) {
+            message = template.createMessage(params);
+        } else {
+            message = template.createMessage();
+        }
+        messageList.add(message);
     }
 
     /**
@@ -165,7 +210,7 @@ public class LLMNode implements NodeAction {
                 try {
                     return Class.forName(className);
                 } catch (ClassNotFoundException e) {
-                    throw new IllegalArgumentException("Failed to load output type class: " + className, e);
+                    return null;
                 }
             }
         }
@@ -173,12 +218,74 @@ public class LLMNode implements NodeAction {
         return llmConfig.getOutputType();
     }
 
-    private DashScopeChatOptions buildOptions() {
-        return DashScopeChatOptions.builder()
-                .model(llmConfig.getModel())
-                .temperature(llmConfig.getTemperature())
-                .topP(llmConfig.getTopP())
-                .build();
+    public static class Builder {
+        //
+        private ChatClient chatClient;
+        //
+        private ChatOptions chatOptions;
+        // 输入参数
+        private String inputKey;
+        private String outputKey;
+        private String systemPrompt;
+        private Map<String, Object> sysParams;
+        private String userPrompt;
+        private Map<String, Object> userParams;
+        private String outputSchema;
+        private String outputPackage;
+
+        public Builder chatClient(ChatClient chatClient) {
+            this.chatClient = chatClient;
+            return this;
+        }
+
+        public Builder chatOptions(ChatOptions chatOptions) {
+            this.chatOptions = chatOptions;
+            return this;
+        }
+
+        public Builder inputKey(String inputKey) {
+            this.inputKey = inputKey;
+            return this;
+        }
+
+        public Builder outputKey(String outputKey) {
+            this.outputKey = outputKey;
+            return this;
+        }
+
+        public Builder systemPrompt(String systemPrompt) {
+            this.systemPrompt = systemPrompt;
+            return this;
+        }
+
+        public Builder sysParams(Map<String, Object> sysParams) {
+            this.sysParams = sysParams;
+            return this;
+        }
+
+        public Builder userPrompt(String userPrompt) {
+            this.userPrompt = userPrompt;
+            return this;
+        }
+
+        public Builder userParams(Map<String, Object> userParams) {
+            this.userParams = userParams;
+            return this;
+        }
+
+        public Builder outputSchema(String outputSchema) {
+            this.outputSchema = outputSchema;
+            return this;
+        }
+
+        public Builder outputPackage(String outputPackage) {
+            this.outputPackage = outputPackage;
+            return this;
+        }
+
+        public LLMNode build() {
+            return new LLMNode(this);
+        }
     }
 
 }

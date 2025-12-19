@@ -112,6 +112,7 @@ public class IntentRecognitionGraph {
                 .outputKey("output")
                 .systemPrompt("")
                 .build();
+        reactAgent.asNode();
         return null;
     }
 

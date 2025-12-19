@@ -2,6 +2,11 @@ package com.example.wx.config.node;
 
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AbstractMessage;
@@ -13,12 +18,6 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * 通用 LLM 调用节点
@@ -46,7 +45,6 @@ public class LLMNode implements NodeAction {
     private String userPrompt;
     private Map<String, Object> userParams;
     private String outputSchema;
-    private String outputPackage;
 
     public LLMNode(Builder builder) {
         this.chatClient = builder.chatClient;
@@ -58,7 +56,6 @@ public class LLMNode implements NodeAction {
         this.userPrompt = builder.userPrompt;
         this.userParams = builder.userParams;
         this.outputSchema = builder.outputSchema;
-        this.outputPackage = builder.outputPackage;
     }
 
     public static Builder builder() {
@@ -69,11 +66,11 @@ public class LLMNode implements NodeAction {
     @Override
     public Map<String, Object> apply(OverAllState state) throws Exception {
 
-
         List<Message> messageList = new ArrayList<>();
         // 渲染 system 和 user 消息模板
         renderSystemPrompt(state, messageList);
         renderUserPrompt(state, messageList);
+        augmentUserMessage(messageList);
 
         Optional<String> value = state.value(this.inputKey, String.class);
         value.ifPresent(s -> messageList.add(new UserMessage(s)));
@@ -86,6 +83,13 @@ public class LLMNode implements NodeAction {
 
         // 处理输出
         return buildResult(callResponse, state);
+    }
+
+    public void augmentUserMessage(List<Message> messages) {
+        if (!StringUtils.hasText(this.outputSchema)) {
+            return;
+        }
+        messages.add(new UserMessage(this.outputSchema));
     }
 
     /**
@@ -219,6 +223,7 @@ public class LLMNode implements NodeAction {
     }
 
     public static class Builder {
+
         //
         private ChatClient chatClient;
         //
@@ -231,7 +236,6 @@ public class LLMNode implements NodeAction {
         private String userPrompt;
         private Map<String, Object> userParams;
         private String outputSchema;
-        private String outputPackage;
 
         public Builder chatClient(ChatClient chatClient) {
             this.chatClient = chatClient;
@@ -275,11 +279,6 @@ public class LLMNode implements NodeAction {
 
         public Builder outputSchema(String outputSchema) {
             this.outputSchema = outputSchema;
-            return this;
-        }
-
-        public Builder outputPackage(String outputPackage) {
-            this.outputPackage = outputPackage;
             return this;
         }
 

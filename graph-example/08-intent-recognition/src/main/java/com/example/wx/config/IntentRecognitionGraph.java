@@ -1,18 +1,17 @@
 package com.example.wx.config;
 
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.alibaba.cloud.ai.dashscope.rag.DashScopeDocumentRetriever;
 import com.alibaba.cloud.ai.dashscope.spec.DashScopeModel;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactoryBuilder;
 import com.alibaba.cloud.ai.graph.StateGraph;
-import com.alibaba.cloud.ai.graph.action.AsyncNodeAction;
 import com.alibaba.cloud.ai.graph.agent.ReactAgent;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
 import com.alibaba.cloud.ai.graph.state.strategy.AppendStrategy;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
 import com.example.wx.config.node.LLMNode;
 import com.example.wx.config.node.RagNode;
-import com.example.wx.domain.LLMConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatModel;
@@ -34,6 +33,7 @@ import static com.example.wx.constants.IntentGraphParams.CLARIFY_LIST;
 import static com.example.wx.constants.IntentGraphParams.HISTORY;
 import static com.example.wx.constants.IntentGraphParams.INTENT_RESULT;
 import static com.example.wx.constants.IntentGraphParams.NOW_DATE;
+import static com.example.wx.constants.IntentGraphParams.OUTPUT_SCHEMA_KEY;
 import static com.example.wx.constants.IntentGraphParams.RAG_RESULT;
 import static com.example.wx.constants.IntentGraphParams.REWRITE_QUERY;
 import static com.example.wx.constants.IntentGraphParams.SLOT_PARAMS;
@@ -72,34 +72,48 @@ public class IntentRecognitionGraph {
                 .build();
 
         // 问题重写节点
-        var rewriteNode = new LLMNode(chatModel, LLMConfig.builder()
+        var rewriteNode = LLMNode.builder()
+                .chatModel(chatModel)
                 .systemPrompt(resourceToString(rewritePrompt))
                 .sysParams(new HashMap<>(Map.of(HISTORY, List.of())))
-                .model(DashScopeModel.ChatModel.DEEPSEEK_V3_1.value)
-                .queryKey(USER_QUERY)
+                .inputKey(USER_QUERY)
                 .outputKey(REWRITE_QUERY)
-                .build());
+                .chatOptions(DashScopeChatOptions.builder()
+                        .model(DashScopeModel.ChatModel.DEEPSEEK_V3_1.value)
+                        .temperature(0.7)
+                        .build())
+                .build();
 
         // 语义召回节点
-        var ragNode = new RagNode(RAG_RESULT, REWRITE_QUERY, dashScopeDocumentRetriever);
+        var ragNode = new RagNode(REWRITE_QUERY, RAG_RESULT, dashScopeDocumentRetriever);
 
         // 意图识别节点
-        var intentNode = new LLMNode(chatModel, LLMConfig.builder()
+        LLMNode.builder()
+                .chatModel(chatModel)
+                .chatOptions(DashScopeChatOptions.builder()
+                        .model(DashScopeModel.ChatModel.DEEPSEEK_V3_1.value)
+                        .temperature(0.7)
+                        .build())
                 .systemPrompt(resourceToString(intentPrompt))
-                .model(DashScopeModel.ChatModel.DEEPSEEK_V3_1.value)
-                .queryKey(USER_QUERY)
-                .userParams(new HashMap<>(Map.of(NOW_DATE, "", WEEK_DAY, "", WEEK_OF_YEAR, "")))
+                .userPrompt("")
+                .userParams(new HashMap<>(Map.of(USER_QUERY, "", REWRITE_QUERY, "", RAG_RESULT, "")))
                 .outputKey(INTENT_RESULT)
-                .build());
+                .build();
 
         // 槽位提取
-        var slotNode = new LLMNode(chatModel, LLMConfig.builder()
+        var slotNode = LLMNode.builder()
+                .chatModel(chatModel)
+                .chatOptions(DashScopeChatOptions.builder()
+                        .model(DashScopeModel.ChatModel.DEEPSEEK_V3_1.value)
+                        .temperature(0.7)
+                        .build())
                 .systemPrompt("")
-                .queryKey(CLARIFY_LIST)
-                .model(DashScopeModel.ChatModel.DEEPSEEK_V3_1.value)
-                .structuredOutput(true)
                 .outputKey(SLOT_PARAMS)
-                .build());
+                .outputSchemaKey(OUTPUT_SCHEMA_KEY)
+                .userPrompt("")
+                .userParams(new HashMap<>(Map.of(USER_QUERY, "", CLARIFY_LIST, "")))
+                .outputSchemaKey("output")
+                .build();
 
         // 知识库问答节点
         var knowledgeNode = node_async(state -> {
@@ -107,12 +121,6 @@ public class IntentRecognitionGraph {
             return Map.of();
         });
 
-        ReactAgent reactAgent =ReactAgent.builder()
-                .model(chatModel)
-                .outputKey("output")
-                .systemPrompt("")
-                .build();
-        reactAgent.asNode();
         return null;
     }
 

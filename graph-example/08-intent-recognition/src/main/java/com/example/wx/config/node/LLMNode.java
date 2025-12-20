@@ -2,22 +2,21 @@ package com.example.wx.config.node;
 
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
+import lombok.AllArgsConstructor;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.chat.prompt.SystemPromptTemplate;
+import org.springframework.util.StringUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import lombok.AllArgsConstructor;
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.messages.AbstractMessage;
-import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.model.Generation;
-import org.springframework.ai.chat.prompt.ChatOptions;
-import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.ai.chat.prompt.SystemPromptTemplate;
-import org.springframework.util.StringUtils;
 
 /**
  * 通用 LLM 调用节点
@@ -35,7 +34,7 @@ import org.springframework.util.StringUtils;
 @AllArgsConstructor
 public class LLMNode implements NodeAction {
 
-    private ChatClient chatClient;
+    private ChatModel chatModel;
     private ChatOptions chatOptions;
     //
     private String inputKey;
@@ -45,9 +44,10 @@ public class LLMNode implements NodeAction {
     private String userPrompt;
     private Map<String, Object> userParams;
     private String outputSchema;
+    private String outputSchemaKey;
 
     public LLMNode(Builder builder) {
-        this.chatClient = builder.chatClient;
+        this.chatModel = builder.chatModel;
         this.chatOptions = builder.chatOptions;
         this.inputKey = builder.inputKey;
         this.outputKey = builder.outputKey;
@@ -56,6 +56,7 @@ public class LLMNode implements NodeAction {
         this.userPrompt = builder.userPrompt;
         this.userParams = builder.userParams;
         this.outputSchema = builder.outputSchema;
+        this.outputSchemaKey = builder.outputSchemaKey;
     }
 
     public static Builder builder() {
@@ -70,22 +71,30 @@ public class LLMNode implements NodeAction {
         // 渲染 system 和 user 消息模板
         renderSystemPrompt(state, messageList);
         renderUserPrompt(state, messageList);
-        augmentUserMessage(messageList);
+        schematUserMessage(state, messageList);
 
         Optional<String> value = state.value(this.inputKey, String.class);
         value.ifPresent(s -> messageList.add(new UserMessage(s)));
 
         // 调用 LLM
-        var callResponse = this.chatClient.prompt()
+        var content = ChatClient.builder(chatModel)
+                .defaultOptions(this.chatOptions)
+                .build()
+                .prompt()
                 .messages(messageList)
-                .options(this.chatOptions)
-                .call();
+                .call().content();
 
         // 处理输出
-        return buildResult(callResponse, state);
+        assert content != null;
+        return Map.of(outputKey, content);
     }
 
-    public void augmentUserMessage(List<Message> messages) {
+    public void schematUserMessage(OverAllState state, List<Message> messages) {
+        Optional<String> value = state.value(this.outputSchemaKey, String.class);
+        if (value.isPresent()) {
+            messages.add(new UserMessage(value.get()));
+            return;
+        }
         if (!StringUtils.hasText(this.outputSchema)) {
             return;
         }
@@ -160,72 +169,10 @@ public class LLMNode implements NodeAction {
         return resolved;
     }
 
-    /**
-     * 构建输出结果
-     * <p>
-     * 根据 structuredOutput 配置决定输出模式：
-     * <ul>
-     *   <li>结构化输出：使用 entity() 自动解析为指定 Java 类型</li>
-     *   <li>纯文本输出：返回原始字符串</li>
-     * </ul>
-     *
-     * @param callResponse ChatClient 调用响应
-     * @param state        全局状态（用于动态解析输出类型）
-     * @return 包含输出结果的 map
-     */
-    private Map<String, Object> buildResult(ChatClient.CallResponseSpec callResponse, OverAllState state) {
-        Map<String, Object> result = new HashMap<>();
-
-        if (llmConfig.isStructuredOutput()) {
-            // 结构化输出
-            Class<?> outputType = resolveOutputType(state);
-            if (outputType == null) {
-                throw new IllegalStateException(
-                        "structuredOutput=true but outputType is not specified. " +
-                                "Please set outputType or outputTypeKey in LLMConfig.");
-            }
-            Object entity = callResponse.entity(outputType);
-            result.put(llmConfig.getOutputKey(), entity);
-        } else {
-            // 纯文本输出
-            String answer = Optional.ofNullable(callResponse.chatResponse())
-                    .map(ChatResponse::getResult)
-                    .map(Generation::getOutput)
-                    .map(AbstractMessage::getText)
-                    .orElse(null);
-            result.put(llmConfig.getOutputKey(), answer);
-        }
-        return result;
-    }
-
-    /**
-     * 解析输出类型
-     * <p>
-     * 优先级：outputTypeKey（动态从 state 获取类名）> outputType（静态配置）
-     *
-     * @param state 全局状态
-     * @return 输出类型的 Class 对象，可能为 null
-     */
-    private Class<?> resolveOutputType(OverAllState state) {
-        // 优先从 state 动态获取类名
-        if (llmConfig.getOutputTypeKey() != null) {
-            String className = state.value(llmConfig.getOutputTypeKey(), "");
-            if (!className.isEmpty()) {
-                try {
-                    return Class.forName(className);
-                } catch (ClassNotFoundException e) {
-                    return null;
-                }
-            }
-        }
-        // 使用静态配置的输出类型
-        return llmConfig.getOutputType();
-    }
-
     public static class Builder {
 
         //
-        private ChatClient chatClient;
+        private ChatModel chatModel;
         //
         private ChatOptions chatOptions;
         // 输入参数
@@ -236,9 +183,10 @@ public class LLMNode implements NodeAction {
         private String userPrompt;
         private Map<String, Object> userParams;
         private String outputSchema;
+        private String outputSchemaKey;
 
-        public Builder chatClient(ChatClient chatClient) {
-            this.chatClient = chatClient;
+        public Builder chatModel(ChatModel chatModel) {
+            this.chatModel = chatModel;
             return this;
         }
 
@@ -279,6 +227,11 @@ public class LLMNode implements NodeAction {
 
         public Builder outputSchema(String outputSchema) {
             this.outputSchema = outputSchema;
+            return this;
+        }
+
+        public Builder outputSchemaKey(String outputSchemaKey) {
+            this.outputSchemaKey = outputSchemaKey;
             return this;
         }
 

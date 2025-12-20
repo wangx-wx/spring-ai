@@ -32,6 +32,7 @@ public interface IntentGraphParams {
     String CLARIFY_LIST = "clarify_list";
     String SLOT_PARAMS = "slot_params";
 
+    String OUTPUT_SCHEMA_KEY = "output_schema_key";
 
     String NODE_ID = "node_id";
 

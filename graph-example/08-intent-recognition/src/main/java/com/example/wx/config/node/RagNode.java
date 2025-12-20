@@ -21,13 +21,13 @@ import org.springframework.ai.rag.Query;
 @AllArgsConstructor
 public class RagNode implements NodeAction {
 
+    private final String inputKey;
     private final String outputKey;
-    private final String query;
     private final DashScopeDocumentRetriever dashScopeDocumentRetriever;
 
     @Override
     public Map<String, Object> apply(OverAllState state) throws Exception {
-        String recall = state.value(query, "");
+        String recall = state.value(inputKey, "");
         List<Document> retrieve = dashScopeDocumentRetriever.retrieve(new Query(recall));
         ArrayList<RagDoc> docs = new ArrayList<>(retrieve.size());
         retrieve.stream()

@@ -36,23 +36,23 @@ public class IntentRecognitionApplication {
     }
 
 
-    @Bean
-    CommandLineRunner test(ChatModel chatModel, DashScopeDocumentRetriever dashScopeDocumentRetriever, @Value("classpath:/prompts/rewrite_prompt.st") Resource systemResource) {
-        return args -> {
-//            List<Document> retrieve = dashScopeDocumentRetriever.retrieve(new Query("12个月的账单"));
-//            ArrayList<RagDoc> docs = new ArrayList<>(retrieve.size());
-//            retrieve.stream()
-//                    .map(d -> new RagDoc(d.getId(), d.getText(), (String) d.getMetadata().get("doc_name"), (Double) d.getMetadata().get("_score")))
-//                    .forEach(docs::add);
-//            System.out.println("docs = " + docs);
-            ChatClient chatClient = ChatClient.builder(chatModel)
-                    .defaultSystem(systemResource)
-                    .build();
-            String content = chatClient.prompt()
-                    .system(s -> s.params(Map.of("history", "[]"))).user("12个月的账单")
-                    .call().content();
-            System.out.println("content = " + content);
-        };
-
-    }
+//     @Bean
+//     CommandLineRunner test(ChatModel chatModel, DashScopeDocumentRetriever dashScopeDocumentRetriever, @Value("classpath:/prompts/rewrite_prompt.st") Resource systemResource) {
+//         return args -> {
+// //            List<Document> retrieve = dashScopeDocumentRetriever.retrieve(new Query("12个月的账单"));
+// //            ArrayList<RagDoc> docs = new ArrayList<>(retrieve.size());
+// //            retrieve.stream()
+// //                    .map(d -> new RagDoc(d.getId(), d.getText(), (String) d.getMetadata().get("doc_name"), (Double) d.getMetadata().get("_score")))
+// //                    .forEach(docs::add);
+// //            System.out.println("docs = " + docs);
+//             ChatClient chatClient = ChatClient.builder(chatModel)
+//                     .defaultSystem(systemResource)
+//                     .build();
+//             String content = chatClient.prompt()
+//                     .system(s -> s.params(Map.of("history", "[]"))).user("12个月的账单")
+//                     .call().content();
+//             System.out.println("content = " + content);
+//         };
+//
+//     }
 }

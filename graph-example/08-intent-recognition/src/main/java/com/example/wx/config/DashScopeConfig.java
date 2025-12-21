@@ -17,8 +17,11 @@ public class DashScopeConfig {
     @Value("${spring.ai.dashscope.api-key}")
     private String apiKey;
 
-    @Value("${spring.ai.dashscope.index-name}")
-    private String indexName;
+    @Value("${spring.ai.dashscope.intent-knowledge}")
+    private String intentKnowledge;
+
+    @Value("${spring.ai.dashscope.qa-knowledge}")
+    private String qaKnowledge;
 
     @Bean
     public DashScopeApi dashScopeApi() {
@@ -26,11 +29,21 @@ public class DashScopeConfig {
     }
 
     @Bean
-    public DashScopeDocumentRetriever dashScopeDocumentRetriever(DashScopeApi dashScopeApi) {
+    public DashScopeDocumentRetriever intentKnowledgeRetriever(DashScopeApi dashScopeApi) {
         return new DashScopeDocumentRetriever(
                 dashScopeApi,
                 DashScopeDocumentRetrieverOptions.builder()
-                        .indexName(indexName)
+                        .indexName(intentKnowledge)
+                        .rerankTopN(8)
+                        .build()
+        );
+    }
+    @Bean
+    public DashScopeDocumentRetriever qaKnowledgeRetriever(DashScopeApi dashScopeApi) {
+        return new DashScopeDocumentRetriever(
+                dashScopeApi,
+                DashScopeDocumentRetrieverOptions.builder()
+                        .indexName(qaKnowledge)
                         .rerankTopN(8)
                         .build()
         );

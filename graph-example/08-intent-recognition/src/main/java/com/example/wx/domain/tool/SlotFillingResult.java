@@ -2,8 +2,6 @@ package com.example.wx.domain.tool;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.Getter;
 
 public record SlotFillingResult<T extends BaseToolRequest>(
         @JsonProperty(required = true, value = "status")
@@ -16,4 +14,7 @@ public record SlotFillingResult<T extends BaseToolRequest>(
         @JsonPropertyDescription("槽位信息")
         T slots
 ) {
+        public static <T extends BaseToolRequest> SlotFillingResult<T> empty() {
+                return new SlotFillingResult<>("1", "", null);
+        }
 }

@@ -17,7 +17,6 @@ import lombok.Data;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = DownloadMerchantIncomeRequest.class, name = "downloadMerchantIncomeRequest"),
         @JsonSubTypes.Type(value = MerchantOrderIncomeTimeRequest.class, name = "merchantOrderTimeRequest"),
-        @JsonSubTypes.Type(value = EquipmentIncomeRequest.class, name = "equipmentIncomeRequest")
 })
 @Data
 public class BaseToolRequest {

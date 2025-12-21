@@ -1,5 +1,7 @@
 package com.example.wx.constants;
 
+import java.util.Map;
+
 /**
  * @author wangxiang
  * @description
@@ -19,8 +21,12 @@ public interface IntentGraphParams {
     // 意图识别结果
     String INTENT_RESULT = "intent";
 
+    // 意图所覆盖范围
+    String INTENT_DESC = "intent_desc";
+
     // 语义召回结果
-    String RAG_RESULT = "rag_list";
+    String INTENT_RAG_RESULT = "intent_rag_list";
+    String QA_RAG_RESULT = "qa_rag_list";
 
     // 槽位提取所需信息
     // 当前时间
@@ -30,7 +36,8 @@ public interface IntentGraphParams {
     // 第几周
     String WEEK_OF_YEAR = "week_of_year";
     String CLARIFY_LIST = "clarify_list";
-    String SLOT_PARAMS = "slot_params";
+
+    String ASSESS_RESULT = "assess_result";
 
     String OUTPUT_SCHEMA_KEY = "output_schema_key";
 
@@ -40,4 +47,7 @@ public interface IntentGraphParams {
     String REPLY = "reply";
     // 恢复执行
     String RESUME = "resume";
+
+    String AGENT_TOOL_INPUT = "agent_tool_inputkey";
+    String AGENT_TOOL_OUTPUT = "agent_tool_outputkey";
 }

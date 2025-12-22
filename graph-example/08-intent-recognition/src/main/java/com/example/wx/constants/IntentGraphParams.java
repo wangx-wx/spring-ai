@@ -37,6 +37,7 @@ public interface IntentGraphParams {
     String WEEK_OF_YEAR = "week_of_year";
     String CLARIFY_LIST = "clarify_list";
 
+    String SKIP_ASSESS_FLAG = "skip_assess";
     String ASSESS_RESULT = "assess_result";
 
     String OUTPUT_SCHEMA_KEY = "output_schema_key";

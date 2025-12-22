@@ -20,6 +20,6 @@ public record AssessResult(
         String reply
 ) {
         public static AssessResult empty() {
-                return new AssessResult("0", "2", "");
+                return new AssessResult("0", "1", "");
         }
 }

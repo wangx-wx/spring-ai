@@ -17,6 +17,6 @@ public record AgentToolResult(
         String reply
 ) {
     public static AgentToolResult empty() {
-        return new AgentToolResult("2", "");
+        return new AgentToolResult("1", "");
     }
 }

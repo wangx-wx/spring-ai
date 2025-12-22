@@ -16,22 +16,32 @@ import com.example.wx.config.node.AgentToolWaitNode;
 import com.example.wx.config.node.AssessWaitNode;
 import com.example.wx.config.node.LLMNode;
 import com.example.wx.config.node.RagNode;
-import com.example.wx.config.node.WaitNode;
+import com.example.wx.domain.tool.AgentToolResult;
 import com.example.wx.domain.tool.AssessResult;
-import com.example.wx.domain.tool.SlotFillingResult;
+import com.example.wx.domain.tool.DownloadMerchantIncomeRequest;
+import com.example.wx.domain.tool.MerchantOrderIncomeTimeRequest;
+import com.example.wx.service.impl.ToolService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.converter.BeanOutputConverter;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.ToolDefinition;
+import org.springframework.ai.tool.method.MethodToolCallback;
+import org.springframework.ai.util.json.schema.JsonSchemaGenerator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,12 +60,13 @@ import static com.example.wx.constants.IntentGraphParams.NOW_DATE;
 import static com.example.wx.constants.IntentGraphParams.OUTPUT_SCHEMA_KEY;
 import static com.example.wx.constants.IntentGraphParams.QA_RAG_RESULT;
 import static com.example.wx.constants.IntentGraphParams.REPLY;
+import static com.example.wx.constants.IntentGraphParams.RESUME;
 import static com.example.wx.constants.IntentGraphParams.REWRITE_QUERY;
+import static com.example.wx.constants.IntentGraphParams.SKIP_ASSESS_FLAG;
 import static com.example.wx.constants.IntentGraphParams.USER_QUERY;
 import static com.example.wx.constants.IntentGraphParams.WEEK_DAY;
 import static com.example.wx.constants.IntentGraphParams.WEEK_OF_YEAR;
 import static com.example.wx.constants.IntentParamConstants.INTENT_DESC_MAP;
-import static com.example.wx.constants.IntentParamConstants.INTENT_MAP;
 import static com.example.wx.constants.PromptConstant.INTENT_NODE_USER_PROMPT;
 
 /**
@@ -77,6 +88,7 @@ public class IntentRecognitionGraph {
 
     @Value("classpath:/prompts/assess_prompt.st")
     private Resource assessPrompt;
+    private final ToolService toolService;
 
     @Bean
     public StateGraph stateGraphIntentRecognition(ChatModel chatModel,
@@ -84,10 +96,11 @@ public class IntentRecognitionGraph {
                                                   DashScopeDocumentRetriever qaKnowledgeRetriever) throws GraphStateException {
 
         KeyStrategyFactory keyStrategyFactory = new KeyStrategyFactoryBuilder()
-                .addPatternStrategy(HISTORY, new AppendStrategy())
                 .addPatternStrategy(USER_QUERY, new ReplaceStrategy())
+                .addPatternStrategy(HISTORY, new AppendStrategy())
                 .addPatternStrategy(REWRITE_QUERY, new ReplaceStrategy())
                 .addPatternStrategy(INTENT_RESULT, new ReplaceStrategy())
+                .addPatternStrategy(INTENT_DESC, new ReplaceStrategy())
                 .addPatternStrategy(INTENT_RAG_RESULT, new ReplaceStrategy())
                 .addPatternStrategy(QA_RAG_RESULT, new ReplaceStrategy())
                 .addPatternStrategy(NOW_DATE, new ReplaceStrategy())
@@ -96,6 +109,9 @@ public class IntentRecognitionGraph {
                 .addPatternStrategy(CLARIFY_LIST, new AppendStrategy())
                 .addPatternStrategy(OUTPUT_SCHEMA_KEY, new ReplaceStrategy())
                 .addPatternStrategy(REPLY, new ReplaceStrategy())
+                .addPatternStrategy(RESUME, new ReplaceStrategy())
+                .addPatternStrategy(AGENT_TOOL_INPUT, new ReplaceStrategy())
+                .addPatternStrategy(AGENT_TOOL_OUTPUT, new ReplaceStrategy())
                 .build();
 
         // 问题重写节点
@@ -127,10 +143,16 @@ public class IntentRecognitionGraph {
                 .outputKey(INTENT_RESULT)
                 .build();
 
+        var intentEdge = edge_async(state -> {
+            var intentResult = state.value(INTENT_RESULT, "其他场景");
+            return "其他场景".equals(intentResult) ? "qa" : "analysis";
+        });
+
         NodeAction setParamNode = (OverAllState state) -> {
             var intentResult = state.value(INTENT_RESULT, String.class).orElse("商家维度经营分析");
             var intentDesc = INTENT_DESC_MAP.get(intentResult);
-            return Map.of(INTENT_DESC, intentDesc);
+            // todo 计算 intent rag score
+            return Map.of(INTENT_DESC, intentDesc, SKIP_ASSESS_FLAG, "skip");
         };
 
         // 意图评估
@@ -144,24 +166,35 @@ public class IntentRecognitionGraph {
                         .temperature(0.7)
                         .build())
                 .systemPrompt(resourceToString(assessPrompt))
-                .sysParams(new HashMap<>(Map.of(HISTORY, "", USER_QUERY, "", INTENT_RAG_RESULT, (Object) null,
+                .sysParams(new HashMap<>(Map.of(HISTORY, "", USER_QUERY, "", INTENT_RAG_RESULT, List.of(),
                         INTENT_RESULT, "", INTENT_DESC, "")))
                 .outputKey(ASSESS_RESULT)
                 .outputSchema(assessSchema.getFormat())
                 .build();
 
-        var assessWaitNode = new AssessWaitNode(AGENT_TOOL_OUTPUT, REPLY);
+        var assessWaitNode = new AssessWaitNode(ASSESS_RESULT, REPLY);
 
-        var agentToolWaitNode = new AgentToolWaitNode(AGENT_TOOL_OUTPUT, REPLY);
+        var assessEdge = edge_async(state -> {
+            var assessResult = state.value(ASSESS_RESULT, AssessResult.class).orElse(AssessResult.empty());
+            return "2".equals(assessResult.status()) ? "tool" : "start";
+        });
+
+        var agentToolSchema = new BeanOutputConverter<>(AgentToolResult.class);
         var agentNode = LLMNode.builder()
                 .chatModel(chatModel)
-                .chatOptions(DashScopeChatOptions.builder().build())
+                .inputKey(USER_QUERY)
+                .outputKey(AGENT_TOOL_OUTPUT)
+                .outputSchema(agentToolSchema.getFormat())
+                .systemPrompt("")
+                .chatOptions(getAgentToolOptions())
                 .build();
+        var agentToolWaitNode = new AgentToolWaitNode(AGENT_TOOL_OUTPUT, REPLY);
 
-        var edged = edge_async(state -> {
-            var slotParams = state.value("slot_params", SlotFillingResult.class).orElse(SlotFillingResult.empty());
-            return "1".equals(slotParams.status()) ? "back" : "next";
+        var agentToolEdge = edge_async(state -> {
+            var assessResult = state.value(AGENT_TOOL_OUTPUT, AgentToolResult.class).orElse(AgentToolResult.empty());
+            return "2".equals(assessResult.status()) ? "next" : "back";
         });
+
 
         // 知识库问答节点
         var qaRagNode = new RagNode(USER_QUERY, QA_RAG_RESULT, qaKnowledgeRetriever);
@@ -182,23 +215,27 @@ public class IntentRecognitionGraph {
                 .addNode("_rewrite_node_", node_async(rewriteNode))
                 .addNode("_intent_rag_node_", node_async(intentRagNode))
                 .addNode("_intent_node_", node_async(intentNode))
-                // .addNode("_slot_node_", node_async(slotNode))
-                // .addNode("_slot_wait_node_", slotWaitNode)
                 .addNode("_qa_rag_node_", node_async(qaRagNode))
                 .addNode("_qa_node_", node_async(qaNode))
-                .addNode("_agent_node_", node_async(agentNode))
+                .addNode("_set_param_node_", node_async(setParamNode))
+                .addNode("_assess_intent_node_", node_async(assessIntent))
+                .addNode("_assess_wait_node_", assessWaitNode)
+                .addNode("_agent_tool_node_", node_async(agentNode))
+                .addNode("_agent_tool_wait_node_", agentToolWaitNode)
                 .addEdge(StateGraph.START, "_rewrite_node_")
                 .addEdge("_rewrite_node_", "_intent_rag_node_")
                 .addEdge("_intent_rag_node_", "_intent_node_")
                 .addConditionalEdges("_intent_node_",
-                        edge_async(state -> state.value(INTENT_RESULT, "其他场景")),
-                        INTENT_MAP)
-                .addEdge("_slot_node_", "_slot_wait_node_")
-                .addConditionalEdges("_slot_wait_node_", edged, Map.of("back", "_slot_node_", "next", "_agent_node_"))
-                .addEdge("_agent_node_", StateGraph.END)
+                        intentEdge, Map.of("qa", "_qa_rag_node_", "analysis", "_set_param_node_"))
                 .addEdge("_qa_rag_node_", "_qa_node_")
-                .addEdge("_qa_node_", StateGraph.END);
-        GraphRepresentation representation = stateGraph.getGraph(GraphRepresentation.Type.MERMAID, "Issue Clarify Graph");
+                .addEdge("_qa_node_", StateGraph.END)
+                .addConditionalEdges("_set_param_node_", edge_async(state -> state.value(SKIP_ASSESS_FLAG, "assess")),
+                        Map.of("assess", "_assess_intent_node_", "skip_assess", "_agent_tool_node_"))
+                .addEdge("_assess_intent_node_", "_assess_wait_node_")
+                .addConditionalEdges("_assess_wait_node_", assessEdge, Map.of("start", "_rewrite_node_", "tool", "_agent_tool_node_"))
+                .addEdge("_agent_tool_node_", "_agent_tool_wait_node_")
+                .addConditionalEdges("_agent_tool_wait_node_", agentToolEdge, Map.of("next", StateGraph.END, "back", "_agent_tool_node_"));
+        GraphRepresentation representation = stateGraph.getGraph(GraphRepresentation.Type.MERMAID, "Intent Clarify Graph");
         System.out.println("======================================");
         System.out.println(representation.content());
         System.out.println("======================================");
@@ -212,6 +249,38 @@ public class IntentRecognitionGraph {
         } catch (IOException ex) {
             throw new RuntimeException("Failed to read resource", ex);
         }
+    }
+
+    private DashScopeChatOptions getAgentToolOptions() {
+        List<ToolCallback> callbacks = new ArrayList<>();
+        Method method = ReflectionUtils.findMethod(ToolService.class, "allAnalyse", MerchantOrderIncomeTimeRequest.class, ToolContext.class);
+        ToolCallback toolCallback = MethodToolCallback.builder()
+                .toolDefinition(ToolDefinition.builder()
+                        .description("商家经营数据分析功能。查询并分析指定周期内的商家经营数据，包括收入、订单量和用户数据。")
+                        .name("incomeAnalyse")
+                        .inputSchema(JsonSchemaGenerator.generateForMethodInput(method))
+                        .build())
+                .toolMethod(method)
+                .toolObject(toolService)
+                .build();
+
+        Method method1 = ReflectionUtils.findMethod(ToolService.class, "downloadTool", DownloadMerchantIncomeRequest.class, ToolContext.class);
+        ToolCallback toolCallback1 = MethodToolCallback.builder()
+                .toolDefinition(ToolDefinition.builder()
+                        .description("下载商家经营数据功能：按照用户的查询时间查询经营数据，并发送到指定的邮箱")
+                        .name("downloadTool")
+                        .inputSchema(JsonSchemaGenerator.generateForMethodInput(method1))
+                        .build())
+                .toolMethod(method)
+                .toolObject(toolService)
+                .build();
+        callbacks.add(toolCallback);
+        callbacks.add(toolCallback1);
+        return DashScopeChatOptions.builder()
+                .toolCallbacks(callbacks)
+                .model(DashScopeModel.ChatModel.DEEPSEEK_V3_1.value)
+                .temperature(0.7)
+                .build();
     }
 
 }

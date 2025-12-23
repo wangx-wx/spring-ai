@@ -7,5 +7,5 @@ spring:
   ai:
     dashscope:
       api-key: ${DASH_SCOPE_API_KEY}
-      intent-knowledge: sit-意图语料库
-      qa-knowledge: sit-意图语料库
+      intent-knowledge: uat-意图识别
+      qa-knowledge: 客服知识库

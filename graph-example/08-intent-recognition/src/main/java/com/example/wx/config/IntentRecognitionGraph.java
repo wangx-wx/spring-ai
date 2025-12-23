@@ -16,6 +16,7 @@ import com.example.wx.config.node.AgentToolWaitNode;
 import com.example.wx.config.node.AssessWaitNode;
 import com.example.wx.config.node.LLMNode;
 import com.example.wx.config.node.RagNode;
+import com.example.wx.domain.RagDoc;
 import com.example.wx.domain.tool.AgentToolResult;
 import com.example.wx.domain.tool.AssessResult;
 import com.example.wx.domain.tool.DownloadMerchantIncomeRequest;
@@ -42,9 +43,11 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.alibaba.cloud.ai.graph.action.AsyncEdgeAction.edge_async;
 import static com.alibaba.cloud.ai.graph.action.AsyncNodeAction.node_async;
@@ -139,7 +142,7 @@ public class IntentRecognitionGraph {
                         .build())
                 .systemPrompt(resourceToString(intentPrompt))
                 .userPrompt(INTENT_NODE_USER_PROMPT)
-                .userParams(new HashMap<>(Map.of(USER_QUERY, "", REWRITE_QUERY, "", INTENT_RAG_RESULT, "")))
+                .userParams(new HashMap<>(Map.of(USER_QUERY, "", REWRITE_QUERY, "", INTENT_RAG_RESULT, List.of())))
                 .outputKey(INTENT_RESULT)
                 .build();
 
@@ -151,8 +154,34 @@ public class IntentRecognitionGraph {
         NodeAction setParamNode = (OverAllState state) -> {
             var intentResult = state.value(INTENT_RESULT, String.class).orElse("商家维度经营分析");
             var intentDesc = INTENT_DESC_MAP.get(intentResult);
-            // todo 计算 intent rag score
-            return Map.of(INTENT_DESC, intentDesc, SKIP_ASSESS_FLAG, "skip");
+            @SuppressWarnings("unchecked")
+            List<RagDoc> ragDocs = (List<RagDoc>) state.value(INTENT_RAG_RESULT, List.class)
+                    .orElse(Collections.emptyList());
+            int totalCount = ragDocs.size();
+            boolean skippAssess = false;
+            if (totalCount > 0) {
+                Map<String, List<RagDoc>> groupedByDocName = ragDocs.stream()
+                        .collect(Collectors.groupingBy(RagDoc::docName));
+                // 计算每个分组中 score > 0.6 的数量占总数的比例
+                Map<String, Double> groupHighScoreRatio = groupedByDocName.entrySet().stream()
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                entry -> {
+                                    long highScoreCount = entry.getValue().stream()
+                                            .filter(doc -> {
+                                                try {
+                                                    return Double.parseDouble(doc.score()) > 0.6;
+                                                } catch (NumberFormatException e) {
+                                                    return false;
+                                                }
+                                            })
+                                            .count();
+                                    return (double) highScoreCount / totalCount;
+                                }
+                        ));
+                skippAssess = groupHighScoreRatio.getOrDefault(intentResult, 0.0) > 0.5;
+            }
+            return Map.of(INTENT_DESC, intentDesc, SKIP_ASSESS_FLAG, skippAssess ? "skip_assess" : "assess");
         };
 
         // 意图评估
@@ -185,7 +214,9 @@ public class IntentRecognitionGraph {
                 .inputKey(USER_QUERY)
                 .outputKey(AGENT_TOOL_OUTPUT)
                 .outputSchema(agentToolSchema.getFormat())
-                .systemPrompt("")
+                .systemPrompt("""
+                        你是 wx 小助手，帮助用户解决问题，结合工具进行回答
+                        """)
                 .chatOptions(getAgentToolOptions())
                 .build();
         var agentToolWaitNode = new AgentToolWaitNode(AGENT_TOOL_OUTPUT, REPLY);
@@ -205,8 +236,15 @@ public class IntentRecognitionGraph {
                         .model(DashScopeModel.ChatModel.DEEPSEEK_V3_1.value)
                         .temperature(0.7)
                         .build())
-                .systemPrompt("")
-                .sysParams(new HashMap<>(Map.of(QA_RAG_RESULT, "")))
+                .systemPrompt("""
+                你是一个智能助手，根据用户问题和知识库召回的信息进行回答
+                
+                召回信息如下
+                --------------------------------
+                {qa_rag_list}
+                --------------------------------
+                """)
+                .sysParams(new HashMap<>(Map.of(QA_RAG_RESULT, List.of())))
                 .inputKey(USER_QUERY)
                 .outputKey(REPLY)
                 .build();
@@ -278,7 +316,7 @@ public class IntentRecognitionGraph {
         callbacks.add(toolCallback1);
         return DashScopeChatOptions.builder()
                 .toolCallbacks(callbacks)
-                .model(DashScopeModel.ChatModel.DEEPSEEK_V3_1.value)
+                .model(DashScopeModel.ChatModel.QWEN3_MAX.value)
                 .temperature(0.7)
                 .build();
     }

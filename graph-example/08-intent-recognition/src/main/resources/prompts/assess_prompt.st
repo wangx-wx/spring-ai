@@ -8,15 +8,15 @@
 ### 1. 会话上下文
 | 字段 | 说明 |
 |-----|------|
-| **历史会话记录** | <history>{conversation_history}</history> |
+| **历史会话记录** | <history>{history_list}</history> |
 | **用户当前提问** | <user_query>{user_query}</user_query> |
 
 ### 2. 召回与意图信息
 | 字段 | 说明 |
 |-----|------|
-| **语义库召回语料** | <recalled_corpus>{recalled_corpus}</recalled_corpus> |
-| **最匹配意图名称** | <intent>{top_intent_name}</intent> |
-| **意图标准定义/处理范围** | <intent_desc>{top_intent_desc}</intent_desc> |
+| **语义库召回语料** | <recalled_corpus>{intent_rag_list}</recalled_corpus> |
+| **最匹配意图名称** | <intent>{intent}</intent> |
+| **意图标准定义/处理范围** | <intent_desc>{intent_desc}</intent_desc> |
 
 ---
 

@@ -2,6 +2,7 @@ package com.example.wx.config.node;
 
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
+import com.example.wx.advisor.TraceLoggerAdvisor;
 import lombok.AllArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
@@ -79,6 +80,7 @@ public class LLMNode implements NodeAction {
         // 调用 LLM
         var content = ChatClient.builder(chatModel)
                 .defaultOptions(this.chatOptions)
+                .defaultAdvisors(new TraceLoggerAdvisor())
                 .build()
                 .prompt()
                 .messages(messageList)

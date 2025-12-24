@@ -3,6 +3,11 @@ package com.example.wx.config.node;
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
 import com.example.wx.advisor.TraceLoggerAdvisor;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
@@ -11,13 +16,8 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
+import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * 通用 LLM 调用节点
@@ -46,6 +46,7 @@ public class LLMNode implements NodeAction {
     private Map<String, Object> userParams;
     private String outputSchema;
     private String outputSchemaKey;
+    private BeanOutputConverter<?> converter;
 
     public LLMNode(Builder builder) {
         this.chatModel = builder.chatModel;
@@ -58,6 +59,7 @@ public class LLMNode implements NodeAction {
         this.userParams = builder.userParams;
         this.outputSchema = builder.outputSchema;
         this.outputSchemaKey = builder.outputSchemaKey;
+        this.converter = builder.converter;
     }
 
     public static Builder builder() {
@@ -88,6 +90,10 @@ public class LLMNode implements NodeAction {
 
         // 处理输出
         assert content != null;
+        if (this.converter != null) {
+            var object = converter.convert(content);
+            return Map.of(outputKey, object);
+        }
         return Map.of(outputKey, content);
     }
 
@@ -186,6 +192,7 @@ public class LLMNode implements NodeAction {
         private Map<String, Object> userParams;
         private String outputSchema;
         private String outputSchemaKey;
+        private BeanOutputConverter<?> converter;
 
         public Builder chatModel(ChatModel chatModel) {
             this.chatModel = chatModel;
@@ -234,6 +241,11 @@ public class LLMNode implements NodeAction {
 
         public Builder outputSchemaKey(String outputSchemaKey) {
             this.outputSchemaKey = outputSchemaKey;
+            return this;
+        }
+
+        public Builder converter(BeanOutputConverter<?> converter) {
+            this.converter = converter;
             return this;
         }
 

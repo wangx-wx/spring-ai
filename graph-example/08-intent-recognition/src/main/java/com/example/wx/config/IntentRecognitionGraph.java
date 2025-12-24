@@ -199,6 +199,7 @@ public class IntentRecognitionGraph {
                         INTENT_RESULT, "", INTENT_DESC, "")))
                 .outputKey(ASSESS_RESULT)
                 .outputSchema(assessSchema.getFormat())
+                .converter(assessSchema)
                 .build();
 
         var assessWaitNode = new AssessWaitNode(ASSESS_RESULT, REPLY);
@@ -217,6 +218,7 @@ public class IntentRecognitionGraph {
                 .systemPrompt("""
                         你是 wx 小助手，帮助用户解决问题，结合工具进行回答
                         """)
+                .converter(agentToolSchema)
                 .chatOptions(getAgentToolOptions())
                 .build();
         var agentToolWaitNode = new AgentToolWaitNode(AGENT_TOOL_OUTPUT, REPLY);

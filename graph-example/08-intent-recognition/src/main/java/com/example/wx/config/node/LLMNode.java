@@ -3,11 +3,6 @@ package com.example.wx.config.node;
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
 import com.example.wx.advisor.TraceLoggerAdvisor;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
@@ -18,6 +13,12 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * 通用 LLM 调用节点
@@ -44,7 +45,6 @@ public class LLMNode implements NodeAction {
     private Map<String, Object> sysParams;
     private String userPrompt;
     private Map<String, Object> userParams;
-    private String outputSchema;
     private String outputSchemaKey;
     private BeanOutputConverter<?> converter;
 
@@ -57,7 +57,6 @@ public class LLMNode implements NodeAction {
         this.sysParams = builder.sysParams;
         this.userPrompt = builder.userPrompt;
         this.userParams = builder.userParams;
-        this.outputSchema = builder.outputSchema;
         this.outputSchemaKey = builder.outputSchemaKey;
         this.converter = builder.converter;
     }
@@ -103,10 +102,10 @@ public class LLMNode implements NodeAction {
             messages.add(new UserMessage(value.get()));
             return;
         }
-        if (!StringUtils.hasText(this.outputSchema)) {
+        if (this.converter == null) {
             return;
         }
-        messages.add(new UserMessage(this.outputSchema));
+        messages.add(new UserMessage(this.converter.getFormat()));
     }
 
     /**
@@ -190,7 +189,6 @@ public class LLMNode implements NodeAction {
         private Map<String, Object> sysParams;
         private String userPrompt;
         private Map<String, Object> userParams;
-        private String outputSchema;
         private String outputSchemaKey;
         private BeanOutputConverter<?> converter;
 
@@ -231,11 +229,6 @@ public class LLMNode implements NodeAction {
 
         public Builder userParams(Map<String, Object> userParams) {
             this.userParams = userParams;
-            return this;
-        }
-
-        public Builder outputSchema(String outputSchema) {
-            this.outputSchema = outputSchema;
             return this;
         }
 

@@ -198,7 +198,6 @@ public class IntentRecognitionGraph {
                 .sysParams(new HashMap<>(Map.of(HISTORY, "", USER_QUERY, "", INTENT_RAG_RESULT, List.of(),
                         INTENT_RESULT, "", INTENT_DESC, "")))
                 .outputKey(ASSESS_RESULT)
-                .outputSchema(assessSchema.getFormat())
                 .converter(assessSchema)
                 .build();
 
@@ -214,7 +213,6 @@ public class IntentRecognitionGraph {
                 .chatModel(chatModel)
                 .inputKey(USER_QUERY)
                 .outputKey(AGENT_TOOL_OUTPUT)
-                .outputSchema(agentToolSchema.getFormat())
                 .systemPrompt("""
                         你是 wx 小助手，帮助用户解决问题，结合工具进行回答
                         """)

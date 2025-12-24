@@ -111,6 +111,8 @@ public class IntentRecognitionGraph {
                 .addPatternStrategy(WEEK_OF_YEAR, new ReplaceStrategy())
                 .addPatternStrategy(CLARIFY_LIST, new AppendStrategy())
                 .addPatternStrategy(OUTPUT_SCHEMA_KEY, new ReplaceStrategy())
+                .addPatternStrategy(SKIP_ASSESS_FLAG, new ReplaceStrategy())
+                .addPatternStrategy(ASSESS_RESULT, new ReplaceStrategy())
                 .addPatternStrategy(REPLY, new ReplaceStrategy())
                 .addPatternStrategy(RESUME, new ReplaceStrategy())
                 .addPatternStrategy(AGENT_TOOL_INPUT, new ReplaceStrategy())
@@ -131,7 +133,7 @@ public class IntentRecognitionGraph {
                 .build();
 
         // 语义召回节点
-        var intentRagNode = new RagNode(USER_QUERY, INTENT_RAG_RESULT, intentKnowledgeRetriever);
+        var intentRagNode = new RagNode(REWRITE_QUERY, INTENT_RAG_RESULT, intentKnowledgeRetriever);
 
         // 意图识别节点
         var intentNode = LLMNode.builder()
@@ -192,7 +194,7 @@ public class IntentRecognitionGraph {
                 .chatModel(chatModel)
                 .chatOptions(DashScopeChatOptions.builder()
                         .model(DashScopeModel.ChatModel.DEEPSEEK_V3_1.value)
-                        .temperature(0.7)
+                        .temperature(0.1)
                         .build())
                 .systemPrompt(resourceToString(assessPrompt))
                 .sysParams(new HashMap<>(Map.of(HISTORY, "", USER_QUERY, "", INTENT_RAG_RESULT, List.of(),

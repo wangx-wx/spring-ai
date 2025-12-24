@@ -11,6 +11,8 @@ import com.alibaba.cloud.ai.graph.checkpoint.savers.MemorySaver;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
 import com.alibaba.cloud.ai.graph.state.StateSnapshot;
 import com.example.wx.config.GraphListener;
+import com.example.wx.domain.ChatMemory;
+import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,10 +22,11 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static com.alibaba.cloud.ai.graph.StateGraph.END;
+import static com.example.wx.constants.IntentGraphParams.HISTORY;
 import static com.example.wx.constants.IntentGraphParams.NOW_DATE;
 import static com.example.wx.constants.IntentGraphParams.REPLY;
 import static com.example.wx.constants.IntentGraphParams.RESUME;
@@ -44,7 +47,7 @@ public class ChatController {
     public ChatController(StateGraph issueClarifyGraph, GraphListener graphListener) throws GraphStateException {
         var saver = new MemorySaver();
         var compileConfig = CompileConfig.builder()
-                .withLifecycleListener(graphListener)
+                // .withLifecycleListener(graphListener)
                 .saverConfig(SaverConfig.builder()
                         .register(saver)
                         .build())

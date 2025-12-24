@@ -37,8 +37,8 @@ public class AssessWaitNode implements AsyncNodeActionWithConfig, InterruptableA
     @Override
     public Optional<InterruptionMetadata> interrupt(String nodeId, OverAllState state, RunnableConfig config) {
         // 获取是否是恢复会话
-        boolean isResume = (boolean) config.context().getOrDefault(RESUME, false);
         var assessResult = state.value(inputKey, AssessResult.class).orElse(AssessResult.empty());
+        boolean isResume = (boolean) config.context().getOrDefault(RESUME, false);
 
         if (StringUtils.hasText(assessResult.reply())) {
             state.input(Map.of(outputKey, assessResult.reply()));
@@ -52,6 +52,7 @@ public class AssessWaitNode implements AsyncNodeActionWithConfig, InterruptableA
                 var updateAssessResult = new AssessResult(assessResult.confidence(), "2", assessResult.reply());
                 config.context().put(inputKey, updateAssessResult);
             }
+            return Optional.empty();
         }
         return Optional.of(InterruptionMetadata.builder(nodeId, state)
                 .addMetadata(outputKey, assessResult.reply())

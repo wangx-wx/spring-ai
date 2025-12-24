@@ -27,7 +27,6 @@ public class AgentToolWaitNode implements AsyncNodeActionWithConfig, Interruptab
     public CompletableFuture<Map<String, Object>> apply(OverAllState state, RunnableConfig config) {
         config.context().remove(RESUME);
         var updateResult = state.value(inputKey, AgentToolResult.class).orElse(AgentToolResult.empty());
-        ;
         Map<String, Object> updates = new HashMap<>();
         if (Objects.equals(updateResult.status(), "2")) {
             updates.put(REPLY, updateResult.reply());

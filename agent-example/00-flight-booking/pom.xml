@@ -10,7 +10,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>flight-booking</artifactId>
+    <artifactId>00-flight-booking</artifactId>
     <version>${revision}</version>
 
     <properties>

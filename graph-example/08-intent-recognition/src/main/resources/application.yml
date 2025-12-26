@@ -9,3 +9,7 @@ spring:
       api-key: ${DASH_SCOPE_API_KEY}
       intent-knowledge: uat-意图识别
       qa-knowledge: 客服知识库
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/db
+    username: pgsql
+    password: 123456

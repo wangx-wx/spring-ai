@@ -1,0 +1,11 @@
+server:
+  port: 10029
+
+spring:
+  application:
+    name: react-agent-example
+  profiles:
+    active: dev
+  ai:
+    dashscope:
+      api-key: ${DASH_SCOPE_API_KEY}

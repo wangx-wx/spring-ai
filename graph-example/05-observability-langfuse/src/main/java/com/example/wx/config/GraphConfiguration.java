@@ -7,7 +7,6 @@ import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactoryBuilder;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.checkpoint.config.SaverConfig;
-import com.alibaba.cloud.ai.graph.checkpoint.constant.SaverEnum;
 import com.alibaba.cloud.ai.graph.checkpoint.savers.MemorySaver;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
 import com.alibaba.cloud.ai.graph.state.strategy.AppendStrategy;
@@ -16,7 +15,6 @@ import com.example.wx.node.ChatNode;
 import com.example.wx.node.MergeNode;
 import com.example.wx.node.SimpleSubGraph;
 import com.example.wx.node.StreamingChatNode;
-import com.google.common.collect.Lists;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
@@ -31,6 +29,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.alibaba.cloud.ai.graph.StateGraph.END;
@@ -116,7 +115,7 @@ public class GraphConfiguration {
                 "Please summarize the streaming analysis results:");
 
         // Merge node - combine parallel outputs for subgraph input
-        MergeNode mergeNode = new MergeNode(Lists.newArrayList("parallel_output1", "parallel_output2"), "sub_input");
+        MergeNode mergeNode = new MergeNode(List.of("parallel_output1", "parallel_output2"), "sub_input");
 
 
         // Streaming node - real-time AI response
@@ -138,7 +137,6 @@ public class GraphConfiguration {
                 .addPatternStrategy("sub_output1", new ReplaceStrategy())
                 .addPatternStrategy("sub_output2", new ReplaceStrategy())
                 .addPatternStrategy("_subgraph", new ReplaceStrategy())
-                // .addPatternStrategy("final_output", new ReplaceStrategy())
                 .addPatternStrategy("subgraph_final_output", new ReplaceStrategy())
                 .addPatternStrategy("streaming_output", new ReplaceStrategy())
                 .addPatternStrategy("summary_output", new ReplaceStrategy())
@@ -179,7 +177,7 @@ public class GraphConfiguration {
             throws GraphStateException {
         // 为子图添加 checkpoint saver 配置，确保子图能正确接收输入
         CompileConfig subgraphCompileConfig = CompileConfig.builder(observationCompileConfig)
-                .saverConfig(SaverConfig.builder().register(SaverEnum.MEMORY.getValue(), new MemorySaver()).build())
+                .saverConfig(SaverConfig.builder().register(new MemorySaver()).build())
                 .build();
 
         return observabilityGraph.compile(subgraphCompileConfig);

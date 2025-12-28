@@ -55,7 +55,8 @@ otel:
     exporter: none
   exporter:
     otlp:
-      endpoint: "https://cloud.langfuse.com/api/public/otel"
-      headers:
-        Authorization: "Basic ${YOUR_BASE64_ENCODED_CREDENTIALS}"
+      endpoint: "http://localhost:4318"
+#      endpoint: "https://cloud.langfuse.com/api/public/otel"
+#      headers:
+#        Authorization: "Basic ${YOUR_BASE64_ENCODED_CREDENTIALS}"
       protocol: http/protobuf

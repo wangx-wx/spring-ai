@@ -9,13 +9,13 @@ spring:
   ai:
     dashscope:
       api-key: ${DASH_SCOPE_API_KEY}
-      chat:
-        options:
-          model: qwen-plus-2025-01-25
     nacos:
       prompt:
         template:
           enabled: true
   nacos:
     server-addr: 127.0.0.1:8848
+    config:
+      username: nacos
+      password: nacos
     

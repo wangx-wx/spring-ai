@@ -17,7 +17,7 @@ import reactor.core.publisher.Flux;
 import java.util.Map;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/7/5 16:51
  */
@@ -59,5 +59,11 @@ public class PromptController {
         return client.prompt(prompt)
                 .stream()
                 .content();
+    }
+
+    @GetMapping("/render")
+    public String render(@RequestParam(value = "name", required = false, defaultValue = "summary-template") String name) {
+        ConfigurablePromptTemplate template = promptTemplateFactory.getTemplate(name);
+        return template.render();
     }
 }

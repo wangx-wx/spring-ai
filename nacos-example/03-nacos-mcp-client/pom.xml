@@ -5,13 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.example.wx</groupId>
-        <artifactId>spring-ai-nacos</artifactId>
+        <artifactId>nacos-example</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>nacos-mcp-server</artifactId>
+    <artifactId>03-nacos-mcp-client</artifactId>
     <version>${revision}</version>
+
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -19,14 +20,26 @@
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-autoconfigure-model-openai</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-autoconfigure-model-chat-client</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-starter-mcp-registry</artifactId>
             <version>${spring-ai-alibaba.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-mcp-server-webflux</artifactId>
+            <artifactId>spring-ai-starter-mcp-client-webflux</artifactId>
         </dependency>
     </dependencies>
 

@@ -17,7 +17,7 @@
         <module>agent-example</module>
         <module>spring-ai-observability</module>
         <module>spring-ai-mcp</module>
-        <module>spring-ai-nacos</module>
+        <module>nacos-example</module>
         <module>graph-example</module>
     </modules>
 

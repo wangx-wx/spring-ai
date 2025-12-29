@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.example.wx</groupId>
-        <artifactId>spring-ai-nacos</artifactId>
+        <artifactId>nacos-example</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>nacos-prompt</artifactId>
+    <artifactId>01-nacos-prompt</artifactId>
     <version>${revision}</version>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

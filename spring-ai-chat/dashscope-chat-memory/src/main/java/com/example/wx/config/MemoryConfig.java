@@ -9,7 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/7/15 21:33
  */

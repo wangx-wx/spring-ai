@@ -5,7 +5,7 @@ import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.action.EdgeAction;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/9/28 22:12
  */

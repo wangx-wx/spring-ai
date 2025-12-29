@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/7/20 19:35
  */

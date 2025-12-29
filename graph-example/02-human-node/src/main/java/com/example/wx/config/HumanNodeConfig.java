@@ -24,7 +24,7 @@ import static com.alibaba.cloud.ai.graph.action.AsyncNodeAction.node_async;
 
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/9/27 21:43
  */

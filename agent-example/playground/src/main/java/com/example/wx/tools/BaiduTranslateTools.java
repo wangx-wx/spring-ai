@@ -21,7 +21,7 @@ import java.util.Random;
 import java.util.function.BiFunction;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/8/24 17:50
  */

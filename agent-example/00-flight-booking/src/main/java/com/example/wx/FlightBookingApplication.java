@@ -20,7 +20,7 @@ import org.springframework.core.io.Resource;
 import java.util.Set;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/6/4 14:50
  */

@@ -73,7 +73,7 @@ import static com.example.wx.constants.IntentParamConstants.INTENT_DESC_MAP;
 import static com.example.wx.constants.PromptConstant.INTENT_NODE_USER_PROMPT;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/12/10 15:24
  */

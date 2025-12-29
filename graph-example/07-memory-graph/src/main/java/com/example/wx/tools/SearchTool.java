@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.util.function.Function;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/12/7 21:10
  */

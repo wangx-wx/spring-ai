@@ -15,7 +15,7 @@ import java.util.List;
 import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description 聊天记录存储在内存中
  * @create 2025/7/15 21:38
  */

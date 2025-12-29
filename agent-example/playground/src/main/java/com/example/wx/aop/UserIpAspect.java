@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/7/20 16:11
  */

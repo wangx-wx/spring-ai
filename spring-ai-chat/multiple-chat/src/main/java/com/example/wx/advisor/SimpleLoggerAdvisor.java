@@ -8,7 +8,7 @@ import org.springframework.ai.chat.client.advisor.api.CallAdvisor;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisorChain;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description Spring AI Advisors API 提供了一种灵活而强大的方法来拦截、修改和增强 Spring 应用程序中的 AI 驱动的交互。
  * @create 2025/6/22 14:29
  */

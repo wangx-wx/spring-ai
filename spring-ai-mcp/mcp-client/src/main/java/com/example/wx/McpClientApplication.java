@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Bean;
 import java.util.Set;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/6/29 16:05
  */

@@ -16,7 +16,7 @@ import java.util.Map;
 import static com.alibaba.cloud.ai.graph.action.AsyncNodeAction.node_async;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description 子图定义
  * @create 2025/9/1 21:24
  */

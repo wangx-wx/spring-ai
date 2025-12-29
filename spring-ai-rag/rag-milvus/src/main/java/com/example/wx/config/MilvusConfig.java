@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/5/26 14:08
  */

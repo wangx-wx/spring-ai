@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description 工厂模式实现知识库创建
  * @create 2025/8/7 21:18
  */

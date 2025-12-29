@@ -4,7 +4,7 @@ import com.example.wx.enums.KnowledgeBaseType;
 import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description 知识库服务接口
  * @create 2025/8/7 21:15
  */

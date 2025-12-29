@@ -12,7 +12,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/8/7 21:21
  */

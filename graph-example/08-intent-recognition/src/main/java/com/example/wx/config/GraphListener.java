@@ -17,7 +17,7 @@ import static com.example.wx.constants.IntentGraphParams.WEEK_DAY;
 import static com.example.wx.constants.IntentGraphParams.WEEK_OF_YEAR;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/12/23 22:08
  */

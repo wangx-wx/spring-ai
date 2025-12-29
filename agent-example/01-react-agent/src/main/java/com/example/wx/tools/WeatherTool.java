@@ -6,7 +6,7 @@ import java.util.function.BiFunction;
 import org.springframework.ai.chat.model.ToolContext;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/12/26 16:03
  */

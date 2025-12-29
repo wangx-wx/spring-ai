@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/7/20 16:11
  */

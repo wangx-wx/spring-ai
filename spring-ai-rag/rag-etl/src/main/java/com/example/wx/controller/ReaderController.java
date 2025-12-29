@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/7/1 13:38
  */

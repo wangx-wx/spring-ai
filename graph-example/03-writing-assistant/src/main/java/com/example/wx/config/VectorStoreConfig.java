@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/9/29 15:21
  */

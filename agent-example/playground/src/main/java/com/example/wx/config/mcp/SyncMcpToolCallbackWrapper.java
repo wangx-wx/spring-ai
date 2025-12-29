@@ -6,7 +6,7 @@ import org.springframework.ai.mcp.SyncMcpToolCallback;
 import java.lang.reflect.Field;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/7/20 17:59
  */

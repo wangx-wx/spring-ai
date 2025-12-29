@@ -3,7 +3,7 @@ package com.example.wx.tools;
 import org.springframework.ai.tool.annotation.Tool;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/6/18 22:16
  */

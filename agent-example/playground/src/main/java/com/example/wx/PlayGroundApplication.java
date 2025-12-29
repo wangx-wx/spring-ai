@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import java.util.Set;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/7/20 15:19
  */

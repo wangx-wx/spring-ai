@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/12/11 21:54
  */

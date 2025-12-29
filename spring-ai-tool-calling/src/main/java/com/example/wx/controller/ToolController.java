@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.lang.reflect.Method;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/6/27 10:55
  */

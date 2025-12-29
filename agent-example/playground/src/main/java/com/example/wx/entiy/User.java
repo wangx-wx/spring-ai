@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/7/20 16:14
  */

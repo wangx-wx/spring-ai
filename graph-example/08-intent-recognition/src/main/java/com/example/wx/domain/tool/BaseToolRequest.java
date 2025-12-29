@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/12/10 18:11
  */

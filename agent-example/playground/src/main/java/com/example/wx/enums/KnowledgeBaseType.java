@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description KnowledgeBaseType
  * @create 2025/8/7 21:16
  */

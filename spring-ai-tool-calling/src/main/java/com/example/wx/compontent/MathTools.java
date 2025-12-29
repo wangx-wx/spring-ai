@@ -4,7 +4,7 @@ import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/5/25 21:17
  */

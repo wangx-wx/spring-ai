@@ -35,7 +35,7 @@ import java.util.List;
 import static com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants.MESSAGE_FORMAT;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/7/26 21:43
  */

@@ -7,7 +7,7 @@ import com.alibaba.cloud.ai.graph.agent.interceptor.ModelResponse;
 import org.springframework.ai.chat.messages.SystemMessage;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description 可以通过模型拦截器动态注入提示词
  * @create 2025/12/26 16:26
  */

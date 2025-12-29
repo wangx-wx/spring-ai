@@ -14,7 +14,7 @@ import java.io.ObjectOutput;
 import java.util.Map;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description Custom StateSerializer for Product object serialization with type information
  * @create 2025/10/25 16:54
  */

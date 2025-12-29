@@ -19,7 +19,7 @@ import java.util.Map;
 import static com.example.wx.utils.McpServerUtils.getMcpLibsAbsPath;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/7/20 18:00
  */

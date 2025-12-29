@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/10/7 10:27
  */

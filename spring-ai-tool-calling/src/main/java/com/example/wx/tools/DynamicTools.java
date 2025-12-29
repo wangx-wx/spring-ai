@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Description;
 import java.util.function.Function;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/6/27 16:23
  */

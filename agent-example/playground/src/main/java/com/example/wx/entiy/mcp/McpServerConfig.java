@@ -6,7 +6,7 @@ import org.springframework.ai.mcp.client.autoconfigure.properties.McpStdioClient
 import java.util.Map;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/7/20 18:03
  */

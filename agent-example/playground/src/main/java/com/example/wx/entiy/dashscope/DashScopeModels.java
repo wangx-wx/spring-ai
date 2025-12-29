@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/7/20 18:07
  */

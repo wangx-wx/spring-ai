@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/6/18 22:00
  */

@@ -1,7 +1,7 @@
 package com.example.wx.constants;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/12/20 16:51
  */

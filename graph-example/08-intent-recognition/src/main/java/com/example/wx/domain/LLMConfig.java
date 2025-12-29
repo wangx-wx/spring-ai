@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/12/9 22:16
  */

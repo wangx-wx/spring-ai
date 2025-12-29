@@ -8,7 +8,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/9/29 16:51
  */

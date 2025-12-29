@@ -15,7 +15,7 @@ import reactor.core.publisher.Flux;
 import javax.validation.constraints.NotNull;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/7/26 22:08
  */

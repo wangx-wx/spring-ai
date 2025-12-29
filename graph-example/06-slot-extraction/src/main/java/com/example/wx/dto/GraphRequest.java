@@ -1,7 +1,7 @@
 package com.example.wx.dto;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/12/8 22:17
  */

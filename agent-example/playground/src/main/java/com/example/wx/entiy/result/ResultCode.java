@@ -1,7 +1,7 @@
 package com.example.wx.entiy.result;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/7/20 15:44
  */

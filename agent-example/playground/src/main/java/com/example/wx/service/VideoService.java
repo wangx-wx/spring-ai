@@ -5,7 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/7/26 22:09
  */

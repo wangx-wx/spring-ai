@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/7/26 22:01
  */

@@ -4,7 +4,7 @@ import org.springframework.core.ParameterizedTypeReference;
 
 /**
  *@description 
- *@author wangxiang
+ *@author wangx
  *@create 2025/8/24 18:07
  */
 public class Converter {

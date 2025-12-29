@@ -14,7 +14,7 @@ import java.util.Scanner;
 import java.util.Set;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/7/12 21:01
  */

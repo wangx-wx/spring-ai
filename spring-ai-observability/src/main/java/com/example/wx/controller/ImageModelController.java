@@ -15,7 +15,7 @@ import java.net.URI;
 import java.net.URL;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/6/18 21:53
  */

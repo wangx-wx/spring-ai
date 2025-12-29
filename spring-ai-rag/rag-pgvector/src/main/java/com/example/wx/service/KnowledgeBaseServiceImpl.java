@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description 知识库服务实现类
  * @create 2025/7/4 14:18
  */

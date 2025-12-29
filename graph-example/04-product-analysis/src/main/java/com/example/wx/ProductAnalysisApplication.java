@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.util.Set;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/10/8 17:56
  */

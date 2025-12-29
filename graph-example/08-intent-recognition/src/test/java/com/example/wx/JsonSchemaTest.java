@@ -12,7 +12,7 @@ import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Method;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/12/20 22:42
  */

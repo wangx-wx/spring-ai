@@ -30,7 +30,7 @@ import java.util.Optional;
  *   <li>动态输出类型（运行时从 state 获取类名）</li>
  * </ul>
  *
- * @author wangxiang
+ * @author wangx
  * @create 2025/12/9 22:06
  */
 @AllArgsConstructor

@@ -3,7 +3,7 @@ package com.example.wx.model;
 import java.util.List;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/10/8 18:10
  */

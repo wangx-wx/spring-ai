@@ -15,7 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/12/25 23:04
  */

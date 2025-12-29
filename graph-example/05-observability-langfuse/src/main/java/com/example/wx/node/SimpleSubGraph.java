@@ -12,7 +12,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import static com.alibaba.cloud.ai.graph.action.AsyncNodeAction.node_async;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/10/25 17:30
  */

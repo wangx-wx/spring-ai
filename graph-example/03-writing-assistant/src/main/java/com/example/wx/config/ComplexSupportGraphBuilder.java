@@ -32,7 +32,7 @@ import java.util.Map;
 import static com.alibaba.cloud.ai.graph.action.AsyncNodeAction.node_async;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/9/29 18:25
  */

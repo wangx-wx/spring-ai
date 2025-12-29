@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.springframework.ai.tool.annotation.ToolParam;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/5/25 17:26
  */

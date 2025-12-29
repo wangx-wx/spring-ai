@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/5/25 17:25
  */

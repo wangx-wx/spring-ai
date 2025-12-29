@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/7/20 17:35
  */

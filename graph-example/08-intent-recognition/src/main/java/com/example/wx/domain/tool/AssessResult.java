@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 /**
- * @author wangxiang
+ * @author wangx
  * @description
  * @create 2025/12/21 15:51
  */

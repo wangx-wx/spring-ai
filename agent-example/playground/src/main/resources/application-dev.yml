@@ -1,7 +1,7 @@
 spring:
   ai:
     dashscope:
-      api-key: ${AI_DASH_SCOPE_API_KEY}
+      api-key: ${DASH_SCOPE_API_KEY}
 #      embedding:
 #        options:
 #          model: text-embedding-v4

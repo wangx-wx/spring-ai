@@ -17,7 +17,7 @@ import java.util.Set;
 public class PlayGroundApplication {
     public static void main(String[] args) {
         Dotenv dotenv = Dotenv.configure().filename(".env").load();
-        Set<String> set = Set.of("AI_DASH_SCOPE_API_KEY", "DEEPSEEK_API_KEY"
+        Set<String> set = Set.of("DASH_SCOPE_API_KEY", "DEEPSEEK_API_KEY"
                 , "VECTOR_STORE_TYPE", "BAIDU_TRANSLATE_APP_ID", "BAIDU_TRANSLATE_SECRET_KEY");
         for (String item : set) {
             System.setProperty(item, dotenv.get(item));

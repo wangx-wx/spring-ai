@@ -61,9 +61,36 @@ public class PromptController {
                 .content();
     }
 
-    @GetMapping("/render")
-    public String render(@RequestParam(value = "name", required = false, defaultValue = "summary-template") String name) {
+    @GetMapping("/template")
+    public String template(@RequestParam(value = "name", required = false, defaultValue = "summary-template") String name) {
         ConfigurablePromptTemplate template = promptTemplateFactory.getTemplate(name);
         return template.render();
+    }
+
+    /**
+     * 聊天问候接口
+     * 从Nacos获取chat-greeting提示词模板，生成个性化问候语后调用大模型
+     *
+     * @param name     用户名称
+     * @param response HttpServletResponse
+     * @return 大模型生成的问候响应（流式返回）
+     */
+    @GetMapping("/greeting")
+    public Flux<String> greeting(
+            @RequestParam(value = "name", defaultValue = "wangx") String name,
+            HttpServletResponse response
+    ) {
+        response.setCharacterEncoding("UTF-8");
+
+        // 从Nacos获取chat-greeting提示词模板
+        ConfigurablePromptTemplate template = promptTemplateFactory.getTemplate("chat-greeting");
+
+        // 渲染模板并创建 Prompt
+        Prompt prompt = template.create(Map.of("name", name));
+        logger.info("问候语 prompt: {}", prompt.getContents());
+
+        return client.prompt(prompt)
+                .stream()
+                .content();
     }
 }

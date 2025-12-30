@@ -1,0 +1,22 @@
+server:
+  port: 0  # 使用随机端口
+
+spring:
+  application:
+    name: nacos-prompt-test
+  ai:
+    dashscope:
+      api-key: test-api-key
+    nacos:
+      prompt:
+        template:
+          enabled: false  # 测试环境禁用 Nacos
+  nacos:
+    server-addr: 127.0.0.1:8848
+    config:
+      enabled: false  # 测试环境禁用 Nacos 配置
+
+logging:
+  level:
+    com.example.wx: DEBUG
+    org.springframework.ai: DEBUG

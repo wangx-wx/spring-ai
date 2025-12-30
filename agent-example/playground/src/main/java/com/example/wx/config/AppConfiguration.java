@@ -20,7 +20,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @Configuration
 public class AppConfiguration {
 
-    private static final String AI_DASH_SCOPE_API_KEY_PREFIX = "AI_DASH_SCOPE_API_KEY";
+    private static final String DASH_SCOPE_API_KEY_PREFIX = "DASH_SCOPE_API_KEY";
 
     @Bean
     public SimpleLoggerAdvisor simpleLoggerAdvisor() {
@@ -58,7 +58,7 @@ public class AppConfiguration {
     @Bean
     public DashScopeApi dashScopeApi() {
         return DashScopeApi.builder()
-                .apiKey(System.getProperty(AI_DASH_SCOPE_API_KEY_PREFIX))
+                .apiKey(System.getProperty(DASH_SCOPE_API_KEY_PREFIX))
                 .build();
     }
 }

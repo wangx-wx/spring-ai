@@ -2,6 +2,7 @@ package com.example.wx.controller;
 
 import com.alibaba.cloud.ai.prompt.ConfigurablePromptTemplate;
 import com.alibaba.cloud.ai.prompt.ConfigurablePromptTemplateFactory;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,15 +12,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
-import reactor.core.publisher.Flux;
-import reactor.test.StepVerifier;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * PromptController 单元测试

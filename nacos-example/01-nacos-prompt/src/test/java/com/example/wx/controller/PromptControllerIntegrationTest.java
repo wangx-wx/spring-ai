@@ -4,14 +4,13 @@ import com.alibaba.cloud.ai.prompt.ConfigurablePromptTemplate;
 import com.alibaba.cloud.ai.prompt.ConfigurablePromptTemplateFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import reactor.core.publisher.Flux;
 
 import java.util.Map;
 
@@ -20,7 +19,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * PromptController 集成测试
@@ -34,10 +34,10 @@ class PromptControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Mock
     private ChatModel chatModel;
 
-    @MockBean
+    @Mock
     private ConfigurablePromptTemplateFactory promptTemplateFactory;
 
     @Test

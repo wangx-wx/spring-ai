@@ -19,9 +19,11 @@
         <module>spring-ai-mcp</module>
         <module>nacos-example</module>
         <module>graph-example</module>
+        <module>spring-ai-evaluation</module>
+        <module>spring-boot-starter-dotenv</module>
     </modules>
 
-    <name>Spring AI</name>
+    <name>Spring AI Learning</name>
     <description>Building AI applications with Spring Boot</description>
 
     <properties>
@@ -83,16 +85,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>com.example.wx</groupId>
+                <artifactId>spring-boot-starter-dotenv</artifactId>
+                <version>${revision}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <dependencies>
-        <dependency>
-            <groupId>io.github.cdimascio</groupId>
-            <artifactId>dotenv-java</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-    </dependencies>
 
     <build>
         <plugins>

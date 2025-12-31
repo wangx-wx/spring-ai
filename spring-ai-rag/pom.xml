@@ -26,6 +26,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.example.wx</groupId>
+            <artifactId>spring-boot-starter-dotenv</artifactId>
+        </dependency>
+    </dependencies>
+
 
 
 </project>

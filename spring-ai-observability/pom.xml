@@ -55,6 +55,11 @@
             <artifactId>zipkin-reporter-brave</artifactId>
             <version>3.4.3</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.example.wx</groupId>
+            <artifactId>spring-boot-starter-dotenv</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

@@ -29,6 +29,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.example.wx</groupId>
+            <artifactId>spring-boot-starter-dotenv</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

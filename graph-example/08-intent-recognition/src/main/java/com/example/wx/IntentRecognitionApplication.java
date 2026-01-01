@@ -1,23 +1,7 @@
 package com.example.wx;
 
-import com.alibaba.cloud.ai.dashscope.rag.DashScopeDocumentRetriever;
-import com.example.wx.domain.RagDoc;
-import io.github.cdimascio.dotenv.Dotenv;
-import java.util.ArrayList;
-import java.util.Map;
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.document.Document;
-import org.springframework.ai.rag.Query;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-
-import java.util.List;
-import java.util.Set;
-import org.springframework.core.io.Resource;
 
 /**
  * @author wangx
@@ -27,11 +11,6 @@ import org.springframework.core.io.Resource;
 @SpringBootApplication
 public class IntentRecognitionApplication {
     public static void main(String[] args) {
-        Dotenv dotenv = Dotenv.configure().filename(".env").load();
-        Set<String> set = Set.of("DASH_SCOPE_API_KEY");
-        for (String item : set) {
-            System.setProperty(item, dotenv.get(item));
-        }
         SpringApplication.run(IntentRecognitionApplication.class, args);
     }
 

@@ -1,7 +1,5 @@
 package com.example.wx;
 
-import io.github.cdimascio.dotenv.Dotenv;
-import java.util.Set;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -14,11 +12,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class WritingAssistantApplication {
 
     public static void main(String[] args) {
-        Dotenv dotenv = Dotenv.configure().filename(".env").load();
-        Set<String> set = Set.of("DASH_SCOPE_API_KEY");
-        for (String item : set) {
-            System.setProperty(item, dotenv.get(item));
-        }
         SpringApplication.run(WritingAssistantApplication.class, args);
     }
 }

@@ -1,6 +1,5 @@
 package com.example.wx;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,7 +10,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import java.util.Scanner;
-import java.util.Set;
 
 /**
  * @author wangx
@@ -21,11 +19,6 @@ import java.util.Set;
 @SpringBootApplication
 public class NacosMcpClientApplication {
     public static void main(String[] args) {
-        Dotenv dotenv = Dotenv.configure().filename(".env").load();
-        Set<String> set = Set.of("DEEPSEEK_API_KEY");
-        for (String item : set) {
-            System.setProperty(item, dotenv.get(item));
-        }
         SpringApplication.run(NacosMcpClientApplication.class, args);
     }
 

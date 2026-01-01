@@ -3,8 +3,6 @@ package com.example.wx;
 import com.alibaba.cloud.ai.graph.agent.ReactAgent;
 import com.example.wx.tools.SearchTool;
 import com.example.wx.tools.WeatherTool;
-import io.github.cdimascio.dotenv.Dotenv;
-import java.util.Set;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
@@ -12,7 +10,6 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 
 /**
  * @author wangx
@@ -23,11 +20,6 @@ import org.springframework.context.annotation.Bean;
 public class ReactAgentApplication {
 
     public static void main(String[] args) {
-        Dotenv dotenv = Dotenv.configure().filename(".env").load();
-        Set<String> set = Set.of("DASH_SCOPE_API_KEY");
-        for (String item : set) {
-            System.setProperty(item, dotenv.get(item));
-        }
         SpringApplication.run(ReactAgentApplication.class, args);
     }
 

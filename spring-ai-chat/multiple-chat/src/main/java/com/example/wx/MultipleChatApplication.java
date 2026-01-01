@@ -1,6 +1,5 @@
 package com.example.wx;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
@@ -9,7 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import java.util.Scanner;
-import java.util.Set;
 
 /**
  * @author wangx
@@ -20,11 +18,6 @@ import java.util.Set;
 public class MultipleChatApplication {
 
     public static void main(String[] args) {
-        Dotenv dotenv = Dotenv.configure().filename(".env").load();
-        Set<String> set = Set.of("DEEPSEEK_API_KEY", "DASH_SCOPE_API_KEY");
-        for (String item : set) {
-            System.setProperty(item, dotenv.get(item));
-        }
         SpringApplication.run(MultipleChatApplication.class, args);
     }
 

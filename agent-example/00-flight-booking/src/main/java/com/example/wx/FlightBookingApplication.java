@@ -1,6 +1,5 @@
 package com.example.wx;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -17,8 +16,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 
-import java.util.Set;
-
 /**
  * @author wangx
  * @description
@@ -27,11 +24,6 @@ import java.util.Set;
 @SpringBootApplication
 public class FlightBookingApplication {
     public static void main(String[] args) {
-        Dotenv dotenv = Dotenv.configure().filename(".env").load();
-        Set<String> set = Set.of("DASH_SCOPE_API_KEY");
-        for (String item : set) {
-            System.setProperty(item, dotenv.get(item));
-        }
         SpringApplication.run(FlightBookingApplication.class, args);
     }
 

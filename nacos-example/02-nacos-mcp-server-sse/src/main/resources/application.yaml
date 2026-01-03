@@ -13,6 +13,7 @@ spring:
       server:
         name: nacos-mcp-server
         version: 1.0.0
+        protocol: sse
         type: async
         instructions: "This reactive server provides time information tools and resources"
         sse-message-endpoint: /mcp/messages
@@ -28,7 +29,7 @@ spring:
           namespace: public
           register:
             enabled: true
-            service-name: webflux-mcp-server
+            service-name: nacos-mcp-server
             service-group: mcp-server
             service-register: true
             service-ephemeral: true

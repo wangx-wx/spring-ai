@@ -7,31 +7,33 @@ spring:
   application:
     name: mcp-nacos-client-example
   ai:
-    openai:
-      api-key: ${DEEPSEEK_API_KEY}
-      chat:
-        options:
-          model: deepseek-chat
-      base-url: https://api.deepseek.com
+    dashscope:
+      api-key: ${DASH_SCOPE_API_KEY}
     mcp:
       client:
         enabled: true
         name: my-mcp-client
         version: 1.0.0
         request-timeout: 30s
-        type: ASYNC  # or ASYNC for reactive applications
+        type: ASYNC
 
     alibaba:
       mcp:
         nacos:
-          namespace: 4ad3108b-4d44-43d0-9634-3c1ac4850c8c
-          server-addr: 127.0.0.1:8848
           client:
+            lazy-init: true
             enabled: true
             sse:
               connections:
                 server1:
-                  service-name: webflux-mcp-server
+                  service-name: nacos-mcp-server
+                  version: 1.0.0
+            configs:
+              server1:
+                namespace: public
+                server-addr: 127.0.0.1:8848
+                username: nacos
+                password: nacos
 
 # 调试日志
 logging:

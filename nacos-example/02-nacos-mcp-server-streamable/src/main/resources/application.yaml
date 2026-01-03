@@ -1,22 +1,21 @@
 server:
-  port: 10018
+  port: 10032
 
 spring:
   profiles:
     active: dev
   application:
-    name: nacos-mcp-server-sse
+    name: nacos-mcp-server-streamable
   main:
     banner-mode: off
   ai:
     mcp:
       server:
-        name: nacos-mcp-server-sse
+        name: nacos-mcp-server-streamable
         version: 1.0.0
-        protocol: sse
-        type: async
-        instructions: "This reactive server provides time information tools and resources"
-        sse-message-endpoint: /mcp/messages
+        protocol: STREAMABLE
+        type: sync
+        instructions: "天气查询"
         capabilities:
           tool: true
           resource: true
@@ -29,7 +28,7 @@ spring:
           namespace: public
           register:
             enabled: true
-            service-name: nacos-mcp-server-sse
+            service-name: nacos-mcp-server-streamable
             service-group: mcp-server
             service-register: true
             service-ephemeral: true

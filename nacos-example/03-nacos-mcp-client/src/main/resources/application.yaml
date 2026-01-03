@@ -25,11 +25,21 @@ spring:
             enabled: true
             sse:
               connections:
-                server1:
-                  service-name: nacos-mcp-server
+                sse-server:
+                  service-name: nacos-mcp-server-sse
+                  version: 1.0.0
+            streamable:
+              connections:
+                streamable-server:
+                  service-name: nacos-mcp-server-streamable
                   version: 1.0.0
             configs:
-              server1:
+              sse-server:
+                namespace: public
+                server-addr: 127.0.0.1:8848
+                username: nacos
+                password: nacos
+              streamable-server:
                 namespace: public
                 server-addr: 127.0.0.1:8848
                 username: nacos

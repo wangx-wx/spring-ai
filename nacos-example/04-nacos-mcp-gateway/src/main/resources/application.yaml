@@ -1,0 +1,49 @@
+server:
+  port: 10033
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: nacos-mcp-gateway
+  main:
+    banner-mode: off
+  ai:
+    dashscope:
+      api-key: ${DASH_SCOPE_API_KEY}
+    # MCP Server 配置 (网关本身作为 MCP Server 对外暴露)
+    mcp:
+      server:
+        name: nacos-mcp-gateway
+        version: 1.0.0
+        protocol: streamable
+        type: sync
+        instructions: "Nacos MCP Gateway - 聚合多个 MCP Server 的工具网关"
+        sse-message-endpoint: /mcp/messages
+        capabilities:
+          tool: true
+          resource: false
+          prompt: false
+          completion: false
+    # 阿里云配置
+    alibaba:
+      # MCP Gateway 配置
+      mcp:
+        gateway:
+          enabled: true
+          registry: nacos
+          # 配置要发现和聚合的 MCP Server 服务名称
+          nacos:
+            serviceNames:
+              - nacos-mcp-server-sse         # SSE 协议的 MCP Server
+              - nacos-mcp-server-streamable  # Streamable 协议的 MCP Server
+        # Nacos 注册中心配置
+        nacos:
+          server-addr: localhost:8848
+          namespace: public
+          username: nacos
+          password: nacos
+
+logging:
+  level:
+    com.alibaba.cloud.ai.mcp: DEBUG

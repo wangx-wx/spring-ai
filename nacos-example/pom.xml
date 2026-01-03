@@ -17,6 +17,8 @@
         <module>02-nacos-mcp-server-sse</module>
         <module>03-nacos-mcp-client</module>
         <module>02-nacos-mcp-server-streamable</module>
+        <module>04-nacos-mcp-gateway</module>
+        <module>05-nacos-mcp-router</module>
     </modules>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

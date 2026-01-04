@@ -1,0 +1,40 @@
+server:
+  port: 18080
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: nacos-mcp-router
+  main:
+    banner-mode: off
+  ai:
+    dashscope:
+      api-key: ${DASH_SCOPE_API_KEY}
+    # 阿里云配置
+    alibaba:
+      mcp:
+        # MCP Router 配置
+        router:
+          enabled: true
+          # 需要发现和路由的 MCP Server 服务名称列表
+          service-names:
+            - nacos-mcp-server-sse         # SSE 协议的 MCP Server
+            - nacos-mcp-server-streamable  # Streamable 协议的 MCP Server
+          # 服务更新间隔 (毫秒)
+          update-interval: 30000
+          # 向量存储配置
+          vector-store:
+            # 语义搜索相似度阈值 (0-1，越大越严格)
+            similarity-threshold: 0.2
+        # Nacos 注册中心配置
+        nacos:
+          server-addr: localhost:8848
+          namespace: public
+          username: nacos
+          password: nacos
+
+logging:
+  level:
+    com.alibaba.cloud.ai.mcp: DEBUG
+    com.alibaba.cloud.ai.mcp.router: DEBUG

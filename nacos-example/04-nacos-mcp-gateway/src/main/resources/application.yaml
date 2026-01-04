@@ -16,10 +16,9 @@ spring:
       server:
         name: nacos-mcp-gateway
         version: 1.0.0
-        protocol: streamable
-        type: sync
+        protocol: sse
+        type: async
         instructions: "Nacos MCP Gateway - 聚合多个 MCP Server 的工具网关"
-        sse-message-endpoint: /mcp/messages
         capabilities:
           tool: true
           resource: false

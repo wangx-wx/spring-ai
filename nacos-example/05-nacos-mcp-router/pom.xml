@@ -31,6 +31,12 @@
             <artifactId>spring-ai-alibaba-starter-mcp-router</artifactId>
         </dependency>
 
+        <!-- MCP Server Common (DbMcpRouterAutoConfiguration 依赖) -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
+        </dependency>
+
         <!-- DashScope 模型 (用于 Embedding 向量化和 ChatClient 调用) -->
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>

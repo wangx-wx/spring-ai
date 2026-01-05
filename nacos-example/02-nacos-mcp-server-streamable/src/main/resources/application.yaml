@@ -16,6 +16,8 @@ spring:
         protocol: STREAMABLE
         type: sync
         instructions: "天气查询"
+        streamable-http:
+          mcp-endpoint: /mcp
         capabilities:
           tool: true
           resource: true

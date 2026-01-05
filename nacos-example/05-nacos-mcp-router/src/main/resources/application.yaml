@@ -1,5 +1,5 @@
 server:
-  port: 18080
+  port: 10034
 
 spring:
   profiles:
@@ -38,3 +38,4 @@ logging:
   level:
     com.alibaba.cloud.ai.mcp: DEBUG
     com.alibaba.cloud.ai.mcp.router: DEBUG
+    com.alibaba.cloud.ai.mcp.router.service: DEBUG

@@ -7,7 +7,7 @@
 ```
 ┌─────────────────┐     ┌─────────────────────────────────┐     ┌───────────────────────┐
 │   MCP Client    │────▶│      Nacos MCP Gateway          │────▶│   Nacos Registry      │
-│   (AI 模型)      │     │      (本示例: 10040)            │     │   (localhost:8848)    │
+│   (AI 模型)      │     │      (本示例: 10033)            │     │   (localhost:8848)    │
 └─────────────────┘     └─────────────────────────────────┘     └───────────────────────┘
                                       │                                    │
                                       │ 发现并聚合工具                       │ 注册
@@ -82,14 +82,14 @@ cd 04-nacos-mcp-gateway
 mvn spring-boot:run
 ```
 
-应用启动后监听端口：**10040**
+应用启动后监听端口：**10033**
 
 ## API 接口
 
 ### 1. 查看聚合的工具列表
 
 ```bash
-GET http://localhost:10040/api/gateway/tools
+GET http://localhost:10033/api/gateway/tools
 ```
 
 响应示例：
@@ -110,18 +110,18 @@ GET http://localhost:10040/api/gateway/tools
 
 ```bash
 # 调用时间工具
-GET http://localhost:10040/api/gateway/chat?message=现在几点了
+GET http://localhost:10033/api/gateway/chat?message=现在几点了
 
 # 调用天气工具
-GET http://localhost:10040/api/gateway/chat?message=杭州的天气怎么样
+GET http://localhost:10033/api/gateway/chat?message=杭州的天气怎么样
 ```
 
 ### 3. MCP SSE 端点
 
 ```bash
 # MCP Client 可通过 SSE 协议连接
-GET http://localhost:10040/sse
-POST http://localhost:10040/mcp/messages
+GET http://localhost:10033/sse
+POST http://localhost:10033/mcp/messages
 ```
 
 ## 工作流程

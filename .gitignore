@@ -34,4 +34,26 @@ target
 
 logs
 
-CLAUDE.md
+
+### 前端 ###
+.vscode/
+
+ # ============== 依赖 ==============
+ node_modules/
+ .pnpm-store/
+ .yarn/
+ package-lock.json
+ yarn.lock
+ pnpm-lock.yaml
+
+# ============== 构建产物 ==============
+dist/
+dist-ssr/
+*.local
+build/
+# ============== 日志 ==============
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*

@@ -216,7 +216,7 @@ public class IntentRecognitionGraph {
                 .inputKey(USER_QUERY)
                 .outputKey(AGENT_TOOL_OUTPUT)
                 .systemPrompt("""
-                        你是 wx 小助手，帮助用户解决问题，结合工具进行回答
+                        你是 wx 小助手，使用工具帮助用户解决问题，结合工具进行中文回答
                         """)
                 .converter(agentToolSchema)
                 .chatOptions(getAgentToolOptions())
@@ -239,7 +239,7 @@ public class IntentRecognitionGraph {
                         .temperature(0.7)
                         .build())
                 .systemPrompt("""
-                你是一个智能助手，根据用户问题和知识库召回的信息进行回答
+                你是一个wx智能助手，根据用户问题和知识库召回的信息进行中文回答
                 
                 召回信息如下
                 --------------------------------
@@ -293,25 +293,25 @@ public class IntentRecognitionGraph {
 
     private DashScopeChatOptions getAgentToolOptions() {
         List<ToolCallback> callbacks = new ArrayList<>();
-        Method method = ReflectionUtils.findMethod(ToolService.class, "allAnalyse", MerchantOrderIncomeTimeRequest.class, ToolContext.class);
+        Method method = ReflectionUtils.findMethod(toolService.getClass(), "allAnalyse", MerchantOrderIncomeTimeRequest.class);
         ToolCallback toolCallback = MethodToolCallback.builder()
                 .toolDefinition(ToolDefinition.builder()
                         .description("商家经营数据分析功能。查询并分析指定周期内的商家经营数据，包括收入、订单量和用户数据。")
-                        .name("incomeAnalyse")
+                        .name("allAnalyse")
                         .inputSchema(JsonSchemaGenerator.generateForMethodInput(method))
                         .build())
                 .toolMethod(method)
                 .toolObject(toolService)
                 .build();
 
-        Method method1 = ReflectionUtils.findMethod(ToolService.class, "downloadTool", DownloadMerchantIncomeRequest.class, ToolContext.class);
+        Method method1 = ReflectionUtils.findMethod(toolService.getClass(), "downloadTool", DownloadMerchantIncomeRequest.class);
         ToolCallback toolCallback1 = MethodToolCallback.builder()
                 .toolDefinition(ToolDefinition.builder()
                         .description("下载商家经营数据功能：按照用户的查询时间查询经营数据，并发送到指定的邮箱")
                         .name("downloadTool")
                         .inputSchema(JsonSchemaGenerator.generateForMethodInput(method1))
                         .build())
-                .toolMethod(method)
+                .toolMethod(method1)
                 .toolObject(toolService)
                 .build();
         callbacks.add(toolCallback);

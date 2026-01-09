@@ -1,20 +1,10 @@
 package com.example.wx.config;
 
-import cn.hutool.core.date.DateUtil;
 import com.alibaba.cloud.ai.graph.GraphLifecycleListener;
 import com.alibaba.cloud.ai.graph.RunnableConfig;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
-
-import static com.example.wx.constants.IntentGraphParams.NOW_DATE;
-import static com.example.wx.constants.IntentGraphParams.REPLY;
-import static com.example.wx.constants.IntentGraphParams.REWRITE_QUERY;
-import static com.example.wx.constants.IntentGraphParams.WEEK_DAY;
-import static com.example.wx.constants.IntentGraphParams.WEEK_OF_YEAR;
 
 /**
  * @author wangx

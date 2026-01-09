@@ -12,8 +12,8 @@ public record AgentToolResult(
         @JsonProperty(required = true, value = "status")
         @JsonPropertyDescription("状态判定，1=需要补充工具参数;2=工具参数完整")
         String status,
-        @JsonProperty(value = "reply")
-        @JsonPropertyDescription("回复用户的信息")
+        @JsonProperty(required = true, value = "reply")
+        @JsonPropertyDescription("回复用户的信息，可以是补充工具参数的信息，或者调用工具总结的信息")
         String reply
 ) {
     public static AgentToolResult empty() {

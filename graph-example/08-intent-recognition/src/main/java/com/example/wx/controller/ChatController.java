@@ -44,12 +44,15 @@ import static com.example.wx.constants.IntentGraphParams.WEEK_OF_YEAR;
 public class ChatController {
     private final CompiledGraph compiledGraph;
 
-    public ChatController(StateGraph issueClarifyGraph, GraphListener graphListener, MemorySaver postgresSaver) throws GraphStateException {
-        // var saver = new MemorySaver();
+    public ChatController(StateGraph issueClarifyGraph
+            , GraphListener graphListener
+//            , MemorySaver postgresSaver
+    ) throws GraphStateException {
+         var saver = new MemorySaver();
         var compileConfig = CompileConfig.builder()
                 // .withLifecycleListener(graphListener)
                 .saverConfig(SaverConfig.builder()
-                        .register(postgresSaver)
+                        .register(saver)
                         .build())
                 .build();
         this.compiledGraph = issueClarifyGraph.compile(compileConfig);

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Simplified AI Chat with Markdown and ECharts</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#136dec",
+                        "sidebar-bg": "#ffffff",
+                        "border-color": "#f0f0f0",
+                        "text-main": "#1f2937",
+                        "text-muted": "#9ca3af"
+                    },
+                    fontFamily: {
+                        "sans": ["Inter", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body { @apply text-text-main bg-[#fafafa]; }
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        code { @apply bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono text-pink-600; }
+        pre { @apply bg-gray-900 text-gray-100 p-4 rounded-xl my-3 overflow-x-auto text-sm; }
+        .prose ul { @apply list-disc ml-5 my-2 space-y-1; }
+        .prose strong { @apply font-bold text-gray-900; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased font-sans">
+<div class="flex h-screen overflow-hidden bg-white">
+<section class="w-80 flex flex-col border-r border-border-color bg-white shrink-0">
+<div class="p-6 border-b border-border-color">
+<div class="flex items-center gap-2 mb-6">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-xl">auto_awesome</span>
+</div>
+<h1 class="text-lg font-bold tracking-tight">AI Assistant</h1>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm">search</span>
+<input class="w-full bg-gray-50 border-none rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-1 focus:ring-primary/20" placeholder="Search conversations..." type="text"/>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto">
+<div class="p-4 border-b border-border-color bg-blue-50/30 border-l-4 border-l-primary cursor-pointer">
+<div class="flex justify-between items-center mb-1">
+<span class="text-sm font-semibold">Data Analysis Report</span>
+<span class="text-[10px] text-text-muted">12:40 PM</span>
+</div>
+<p class="text-xs text-text-muted truncate">Here's the breakdown of your monthly analytics...</p>
+</div>
+<div class="p-4 border-b border-border-color hover:bg-gray-50 cursor-pointer transition-colors">
+<div class="flex justify-between items-center mb-1">
+<span class="text-sm font-medium text-gray-700">Billing Inquiry</span>
+<span class="text-[10px] text-text-muted">Yesterday</span>
+</div>
+<p class="text-xs text-text-muted truncate">Can you explain the charge for October?</p>
+</div>
+<div class="p-4 border-b border-border-color hover:bg-gray-50 cursor-pointer transition-colors">
+<div class="flex justify-between items-center mb-1">
+<span class="text-sm font-medium text-gray-700">API Documentation</span>
+<span class="text-[10px] text-text-muted">Oct 22</span>
+</div>
+<p class="text-xs text-text-muted truncate">How do I implement the webhook listener?</p>
+</div>
+</div>
+<div class="p-4 border-t border-border-color">
+<button class="w-full flex items-center justify-center gap-2 py-2.5 bg-gray-50 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-100 transition-colors">
+<span class="material-symbols-outlined text-lg">add</span>
+                New Chat
+            </button>
+</div>
+</section>
+<main class="flex-1 flex flex-col bg-white">
+<header class="h-16 flex items-center justify-between px-8 border-b border-border-color shrink-0">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-blue-100 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-xl">smart_toy</span>
+</div>
+<div>
+<h2 class="text-sm font-bold leading-none">AI Analytics Expert</h2>
+<p class="text-[11px] text-green-500 font-medium mt-1">Active Now</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-text-muted hover:text-text-main transition-colors">
+<span class="material-symbols-outlined">share</span>
+</button>
+<button class="text-text-muted hover:text-text-main transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-8 lg:px-24 xl:px-48 space-y-8 scrollbar-hide">
+<div class="flex flex-row-reverse gap-4">
+<div class="size-8 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-sm text-gray-500">person</span>
+</div>
+<div class="max-w-[80%] bg-primary text-white px-5 py-3 rounded-2xl rounded-tr-none shadow-sm text-sm">
+                    Can you show me a performance summary of our sales for the last 6 months? Please include a chart and a brief summary of the trends.
+                </div>
+</div>
+<div class="flex gap-4">
+<div class="size-8 rounded-full bg-blue-50 flex items-center justify-center shrink-0 border border-blue-100">
+<span class="material-symbols-outlined text-sm text-primary">auto_awesome</span>
+</div>
+<div class="max-w-[85%] space-y-4">
+<div class="prose text-sm text-gray-700 leading-relaxed">
+<p>Certainly! I've analyzed your sales data from May to October. Here is the visualization and key findings:</p>
+<div class="my-6 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+<div id="chart-container" style="height: 300px; width: 100%;"></div>
+</div>
+<p><strong>Key Insights:</strong></p>
+<ul>
+<li><strong>Growth Trend:</strong> We observed a steady 15% month-over-month growth since July.</li>
+<li><strong>Peak Performance:</strong> October reached a record high of <strong>$12,400</strong>.</li>
+<li><strong>Seasonality:</strong> The dip in June was expected based on historical patterns.</li>
+</ul>
+<p>To pull this data via our API, you can use the following snippet:</p>
+<pre><code>GET /v1/analytics/sales
+{
+  "period": "last_6_months",
+  "metric": "revenue"
+}</code></pre>
+<p>Would you like me to break down these numbers by region or product category?</p>
+</div>
+</div>
+</div>
+</div>
+<div class="p-8 lg:px-24 xl:px-48 border-t border-border-color">
+<div class="relative flex items-end gap-3 bg-gray-50 border border-gray-200 rounded-2xl p-2 pl-4 pr-2 focus-within:ring-1 focus-within:ring-primary/20 transition-all">
+<textarea class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2 px-0 min-h-[44px] max-h-32 resize-none placeholder-text-muted" placeholder="Ask anything about your data..."></textarea>
+<div class="flex gap-1 pb-1">
+<button class="p-2 text-text-muted hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl">attach_file</span>
+</button>
+<button class="bg-primary text-white size-10 rounded-xl flex items-center justify-center hover:bg-blue-700 transition-colors shadow-sm shadow-primary/20">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+<p class="text-[10px] text-center text-text-muted mt-4">AI can make mistakes. Check important info.</p>
+</div>
+</main>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var chartDom = document.getElementById('chart-container');
+        var myChart = echarts.init(chartDom);
+        var option;
+        option = {
+            animation: false,
+            tooltip: {
+                trigger: 'axis',
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                borderColor: '#e5e7eb',
+                textStyle: { color: '#111827' }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                top: '10%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                axisLine: { lineStyle: { color: '#e5e7eb' } },
+                axisLabel: { color: '#9ca3af', fontSize: 11 }
+            },
+            yAxis: {
+                type: 'value',
+                splitLine: { lineStyle: { color: '#f3f4f6', type: 'dashed' } },
+                axisLabel: { color: '#9ca3af', fontSize: 11 }
+            },
+            series: [
+                {
+                    name: 'Sales Revenue',
+                    type: 'line',
+                    smooth: true,
+                    symbolSize: 8,
+                    itemStyle: { color: '#136dec' },
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgba(19, 109, 236, 0.2)' },
+                            { offset: 1, color: 'rgba(19, 109, 236, 0)' }
+                        ])
+                    },
+                    data: [8200, 7100, 9400, 10200, 11500, 12400]
+                }
+            ]
+        };
+        myChart.setOption(option);
+        window.addEventListener('resize', function() {
+            myChart.resize();
+        });
+    });
+</script>
+
+</body></html>

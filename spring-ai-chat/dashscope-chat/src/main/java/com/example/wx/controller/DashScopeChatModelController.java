@@ -54,7 +54,7 @@ public class DashScopeChatModelController {
 
         Flux<ChatResponse> stream = dashScopeChatModel.stream(new Prompt(DEFAULT_PROMPT, DashScopeChatOptions
                 .builder()
-                .withModel(DashScopeModel.ChatModel.QWEN_PLUS.getName())
+                .model(DashScopeModel.ChatModel.QWEN_PLUS.getName())
                 .build()));
         return stream.map(resp -> resp.getResult().getOutput().getText());
     }

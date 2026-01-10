@@ -91,6 +91,10 @@ public class IntentRecognitionGraph {
 
     @Value("classpath:/prompts/assess_prompt.st")
     private Resource assessPrompt;
+
+    @Value("classpath:/prompts/income_analyze.st")
+    private Resource incomeAnalyzePrompt;
+
     private final ToolService toolService;
 
     @Bean

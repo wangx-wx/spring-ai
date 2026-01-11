@@ -5,6 +5,7 @@ import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
 import com.example.wx.domain.RagDoc;
 import lombok.AllArgsConstructor;
+import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.rag.Query;
 
@@ -28,8 +29,16 @@ public class RagNode implements NodeAction {
 
     @Override
     public Map<String, Object> apply(OverAllState state) throws Exception {
-        String recall = state.value(inputKey, "");
-        List<Document> retrieve = dashScopeDocumentRetriever.retrieve(new Query(recall));
+        Object object = state.value(inputKey).orElse(null);
+        String call = "";
+        if (object instanceof AssistantMessage assistantMessage) {
+            call = assistantMessage.getText();
+        } else if ( object instanceof String str){
+            call = str;
+        } else {
+            throw new RuntimeException(inputKey + " is null");
+        }
+        List<Document> retrieve = dashScopeDocumentRetriever.retrieve(new Query(call));
         ArrayList<RagDoc> docs = new ArrayList<>(retrieve.size());
         retrieve.stream()
                 .filter(d -> {

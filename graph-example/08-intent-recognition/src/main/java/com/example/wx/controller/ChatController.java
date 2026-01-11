@@ -105,7 +105,6 @@ public class ChatController {
                 .build();
 
         return getExecutionStream(query, config)
-                .publishOn(Schedulers.boundedElastic())
                 .map(this::toChatResult)
                 .concatWithValues(ChatResult.end());
     }

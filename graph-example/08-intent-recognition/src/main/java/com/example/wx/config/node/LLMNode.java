@@ -79,21 +79,33 @@ public class LLMNode implements NodeAction {
         Optional<String> value = state.value(this.inputKey, String.class);
         value.ifPresent(s -> messageList.add(new UserMessage(s)));
 
-        // 调用 LLM
-        var content = ChatClient.builder(chatModel)
-                .defaultOptions(this.chatOptions)
-                // .defaultAdvisors(new TraceLoggerAdvisor())
-                .build()
-                .prompt()
-                .messages(messageList)
-                .call().content();
+        if (this.isStream) {
+            var chatResponseFlux = ChatClient.builder(chatModel)
+                    .defaultOptions(this.chatOptions)
+                    // .defaultAdvisors(new TraceLoggerAdvisor())
+                    .build()
+                    .prompt()
+                    .messages(messageList)
+                    .stream().chatResponse();
+            return Map.of(outputKey, chatResponseFlux);
+        } else {
+            // 调用 LLM
+            var content = ChatClient.builder(chatModel)
+                    .defaultOptions(this.chatOptions)
+                    // .defaultAdvisors(new TraceLoggerAdvisor())
+                    .build()
+                    .prompt()
+                    .messages(messageList)
+                    .call().content();
 
-        // 处理输出
-        if (this.converter != null) {
-            var object = converter.convert(content);
-            return Map.of(outputKey, object);
+            // 处理输出
+            assert content != null;
+            if (this.converter != null) {
+                var object = converter.convert(content);
+                return Map.of(outputKey, object);
+            }
+            return Map.of(outputKey, content);
         }
-        return Map.of(outputKey, content);
     }
 
     public void schematUserMessage(OverAllState state, List<Message> messages) {

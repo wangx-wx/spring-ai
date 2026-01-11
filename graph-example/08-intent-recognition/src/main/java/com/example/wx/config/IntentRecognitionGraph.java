@@ -24,6 +24,7 @@ import com.example.wx.domain.tool.MerchantOrderIncomeTimeRequest;
 import com.example.wx.service.impl.ToolService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.converter.BeanOutputConverter;
@@ -130,6 +131,7 @@ public class IntentRecognitionGraph {
                 .sysParams(new HashMap<>(Map.of(HISTORY, List.of())))
                 .inputKey(USER_QUERY)
                 .outputKey(REWRITE_QUERY)
+                .isStream(true)
                 .chatOptions(DashScopeChatOptions.builder()
                         .model(DashScopeModel.ChatModel.DEEPSEEK_V3_1.value)
                         .temperature(0.7)
@@ -150,10 +152,11 @@ public class IntentRecognitionGraph {
                 .userPrompt(INTENT_NODE_USER_PROMPT)
                 .userParams(new HashMap<>(Map.of(USER_QUERY, "", REWRITE_QUERY, "", INTENT_RAG_RESULT, List.of())))
                 .outputKey(INTENT_RESULT)
+                .isStream(true)
                 .build();
 
         var intentEdge = edge_async(state -> {
-            var intentResult = state.value(INTENT_RESULT, "其他场景");
+            var intentResult = state.value(INTENT_RESULT, AssistantMessage.class).orElse(new AssistantMessage("其他场景")).getText();
             return "其他场景".equals(intentResult) ? "qa" : "analysis";
         });
 
@@ -205,9 +208,10 @@ public class IntentRecognitionGraph {
                         INTENT_RESULT, "", INTENT_DESC, "")))
                 .outputKey(ASSESS_RESULT)
                 .converter(assessSchema)
+                .isStream(true)
                 .build();
 
-        var assessWaitNode = new AssessWaitNode(ASSESS_RESULT, REPLY);
+        var assessWaitNode = new AssessWaitNode(ASSESS_RESULT, REPLY, assessSchema);
 
         var assessEdge = edge_async(state -> {
             var assessResult = state.value(ASSESS_RESULT, AssessResult.class).orElse(AssessResult.empty());
@@ -224,8 +228,9 @@ public class IntentRecognitionGraph {
                         """)
                 .converter(agentToolSchema)
                 .chatOptions(getAgentToolOptions())
+                .isStream(true)
                 .build();
-        var agentToolWaitNode = new AgentToolWaitNode(AGENT_TOOL_OUTPUT, REPLY);
+        var agentToolWaitNode = new AgentToolWaitNode(AGENT_TOOL_OUTPUT, REPLY, agentToolSchema);
 
         var agentToolEdge = edge_async(state -> {
             var assessResult = state.value(AGENT_TOOL_OUTPUT, AgentToolResult.class).orElse(AgentToolResult.empty());
@@ -253,6 +258,7 @@ public class IntentRecognitionGraph {
                 .sysParams(new HashMap<>(Map.of(QA_RAG_RESULT, List.of())))
                 .inputKey(USER_QUERY)
                 .outputKey(REPLY)
+                .isStream(true)
                 .build();
 
         StateGraph stateGraph = new StateGraph(keyStrategyFactory)

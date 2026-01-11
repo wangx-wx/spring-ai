@@ -2,6 +2,7 @@ package com.example.wx.node;
 
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
+import org.springframework.ai.chat.messages.AssistantMessage;
 
 import java.util.Map;
 

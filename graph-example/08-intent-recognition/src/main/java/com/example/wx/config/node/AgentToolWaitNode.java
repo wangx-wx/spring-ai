@@ -7,6 +7,8 @@ import com.alibaba.cloud.ai.graph.action.InterruptableAction;
 import com.alibaba.cloud.ai.graph.action.InterruptionMetadata;
 import com.example.wx.domain.tool.AgentToolResult;
 import lombok.RequiredArgsConstructor;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
@@ -22,11 +24,23 @@ import static com.example.wx.constants.IntentGraphParams.RESUME;
 public class AgentToolWaitNode implements AsyncNodeActionWithConfig, InterruptableAction {
     private final String inputKey;
     private final String outputKey;
+    private final BeanOutputConverter<?> converter;
 
     @Override
     public CompletableFuture<Map<String, Object>> apply(OverAllState state, RunnableConfig config) {
         config.context().remove(RESUME);
-        var updateResult = state.value(inputKey, AgentToolResult.class).orElse(AgentToolResult.empty());
+        AgentToolResult updateResult = AgentToolResult.empty();
+        Optional<Object> value = state.value(inputKey);
+        if (value.isPresent()) {
+            Object object = value.get();
+            if (object instanceof AssistantMessage assistantMessage) {
+                updateResult = (AgentToolResult) converter.convert(Objects.requireNonNull(assistantMessage.getText()));
+            } else {
+                updateResult = (AgentToolResult) object;
+            }
+        } else {
+            throw new RuntimeException(inputKey + "is null");
+        }
         Map<String, Object> updates = new HashMap<>();
         if (Objects.equals(updateResult.status(), "2")) {
             updates.put(REPLY, updateResult.reply());

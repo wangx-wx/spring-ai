@@ -1,7 +1,9 @@
 package com.example.wx.config.node;
 
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
+import com.example.wx.domain.ChatMemory;
 import lombok.AllArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
@@ -18,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.example.wx.constants.IntentGraphParams.HISTORY;
 
 /**
  * 通用 LLM 调用节点
@@ -78,7 +82,7 @@ public class LLMNode implements NodeAction {
 
         Optional<String> value = state.value(this.inputKey, String.class);
         value.ifPresent(s -> messageList.add(new UserMessage(s)));
-
+        Map<String, Object> resultMap = new HashMap<>();
         if (this.isStream) {
             var chatResponseFlux = ChatClient.builder(chatModel)
                     .defaultOptions(this.chatOptions)
@@ -87,7 +91,7 @@ public class LLMNode implements NodeAction {
                     .prompt()
                     .messages(messageList)
                     .stream().chatResponse();
-            return Map.of(outputKey, chatResponseFlux);
+            resultMap.put(outputKey, chatResponseFlux);
         } else {
             // 调用 LLM
             var content = ChatClient.builder(chatModel)
@@ -102,10 +106,13 @@ public class LLMNode implements NodeAction {
             assert content != null;
             if (this.converter != null) {
                 var object = converter.convert(content);
-                return Map.of(outputKey, object);
+                resultMap.put(outputKey, object);
+            } else {
+                resultMap.put(outputKey, content);
             }
-            return Map.of(outputKey, content);
         }
+        resultMap.put( HISTORY, new ChatMemory("user",  content, DateUtil.date().toStringDefaultTimeZone()));
+        return resultMap;
     }
 
     public void schematUserMessage(OverAllState state, List<Message> messages) {

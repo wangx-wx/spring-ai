@@ -11,6 +11,7 @@ import com.alibaba.cloud.ai.graph.checkpoint.savers.MemorySaver;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
 import com.alibaba.cloud.ai.graph.state.StateSnapshot;
 import com.example.wx.config.GraphListener;
+import com.example.wx.domain.ChatMemory;
 import com.example.wx.domain.ChatResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -28,6 +29,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import static com.alibaba.cloud.ai.graph.StateGraph.END;
+import static com.example.wx.constants.IntentGraphParams.HISTORY;
 import static com.example.wx.constants.IntentGraphParams.NOW_DATE;
 import static com.example.wx.constants.IntentGraphParams.REPLY;
 import static com.example.wx.constants.IntentGraphParams.RESUME;
@@ -177,7 +179,7 @@ public class ChatController {
             config.context().put(RESUME, Boolean.TRUE);
             // 更新状态：将用户新输入写入 user_query
             RunnableConfig runnableConfig = this.compiledGraph.updateState(config, Map.of(
-                    USER_QUERY, query
+                    USER_QUERY, query, HISTORY, new ChatMemory("user",  query, DateUtil.date().toStringDefaultTimeZone())
             ), null);
             // 从中断点继续执行工作流
             return this.compiledGraph.stream(null, runnableConfig);
@@ -193,7 +195,8 @@ public class ChatController {
                 REPLY, (String) "",
                 NOW_DATE, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                 WEEK_DAY, DateUtil.dayOfWeek(DateUtil.date()),
-                WEEK_OF_YEAR, DateUtil.dayOfWeekEnum(DateUtil.date()).toChinese()
+                WEEK_OF_YEAR, DateUtil.dayOfWeekEnum(DateUtil.date()).toChinese(),
+                HISTORY, new ChatMemory("user",  query, DateUtil.date().toStringDefaultTimeZone())
         );
         // 从初始状态开始执行工作流
         return this.compiledGraph.stream(initialState, config);

@@ -22,6 +22,7 @@
         <module>06-slot-extraction</module>
         <module>07-memory-graph</module>
         <module>08-intent-recognition</module>
+        <module>09-stream-node</module>
     </modules>
 
     <properties>

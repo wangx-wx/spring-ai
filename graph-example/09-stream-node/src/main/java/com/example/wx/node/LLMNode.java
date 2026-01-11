@@ -1,4 +1,4 @@
-package com.example.wx.config.node;
+package com.example.wx.node;
 
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
@@ -46,7 +46,6 @@ public class LLMNode implements NodeAction {
     private Map<String, Object> userParams;
     private String outputSchemaKey;
     private BeanOutputConverter<?> converter;
-    private boolean isStream;
 
     public LLMNode(Builder builder) {
         this.chatModel = builder.chatModel;
@@ -59,7 +58,6 @@ public class LLMNode implements NodeAction {
         this.userParams = builder.userParams;
         this.outputSchemaKey = builder.outputSchemaKey;
         this.converter = builder.converter;
-        this.isStream = builder.isStream;
     }
 
     public static Builder builder() {
@@ -82,13 +80,13 @@ public class LLMNode implements NodeAction {
         // 调用 LLM
         var content = ChatClient.builder(chatModel)
                 .defaultOptions(this.chatOptions)
-                // .defaultAdvisors(new TraceLoggerAdvisor())
                 .build()
                 .prompt()
                 .messages(messageList)
                 .call().content();
 
         // 处理输出
+        assert content != null;
         if (this.converter != null) {
             var object = converter.convert(content);
             return Map.of(outputKey, object);
@@ -191,12 +189,6 @@ public class LLMNode implements NodeAction {
         private Map<String, Object> userParams;
         private String outputSchemaKey;
         private BeanOutputConverter<?> converter;
-        private boolean isStream = false;
-
-        public Builder isStream(boolean isStream) {
-            this.isStream = isStream;
-            return this;
-        }
 
         public Builder chatModel(ChatModel chatModel) {
             this.chatModel = chatModel;

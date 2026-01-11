@@ -1,0 +1,11 @@
+server:
+  port: 10035
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: stream-node-example
+  ai:
+    dashscope:
+      api-key: ${DASH_SCOPE_API_KEY}

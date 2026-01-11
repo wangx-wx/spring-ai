@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -76,6 +77,18 @@ public class ChatController {
                 );
     }
 
+
+    @GetMapping(value = "/stream1", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<NodeOutput> stream1(
+            @RequestParam(value = "query", defaultValue = "你好，你可以做什么") String query,
+            @RequestParam(value = "chatId", defaultValue = "chat-id-10001") String chatId) {
+        var config = RunnableConfig.builder()
+                .threadId(chatId)
+                .build();
+
+        return startNewConversation(query, config);
+    }
+
     /**
      * SSE流式接口，实时推送节点执行结果
      *
@@ -92,13 +105,8 @@ public class ChatController {
                 .build();
 
         return getExecutionStream(query, config)
-                .doOnNext(nodeOutput -> {
-                    System.out.println("===== 收到 NodeOutput，开始转换为 ChatResult =====");
-                })
+                .publishOn(Schedulers.boundedElastic())
                 .map(this::toChatResult)
-                .doOnNext(chatResult -> {
-                    System.out.println("===== ChatResult 准备发送: " + chatResult.getNodeName() + " =====");
-                })
                 .concatWithValues(ChatResult.end());
     }
 
@@ -130,30 +138,20 @@ public class ChatController {
                 .threadId(chatId)
                 .build();
         // 创建 Sink，unicast 适用于单订阅者场景
-        // Sinks.Many<ChatResult> sink = Sinks.many().unicast().onBackpressureBuffer();
-        // getExecutionStream(query, config).doOnNext(nodeOutput -> {
-        //             // 手动发送数据
-        //             ChatResult result = toChatResult(nodeOutput);
-        //             sink.tryEmitNext(result);
-        //         })
-        //         .doOnComplete(() -> {
-        //             // 发送结束标记并关闭
-        //             sink.tryEmitNext(ChatResult.end());
-        //             sink.tryEmitComplete();
-        //         })
-        //         .doOnError(sink::tryEmitError)
-        //         .subscribe();  // 启动订阅
-        // return sink.asFlux();
-        return Flux.create(emitter -> {
-            getExecutionStream(query, config)
-                    .doOnNext(nodeOutput -> emitter.next(toChatResult(nodeOutput)))
-                    .doOnComplete(() -> {
-                        emitter.next(ChatResult.end());
-                        emitter.complete();
-                    })
-                    .doOnError(emitter::error)
-                    .subscribe();
-        });
+        Sinks.Many<ChatResult> sink = Sinks.many().unicast().onBackpressureBuffer();
+        getExecutionStream(query, config).doOnNext(nodeOutput -> {
+                    // 手动发送数据
+                    ChatResult result = toChatResult(nodeOutput);
+                    sink.tryEmitNext(result);
+                })
+                .doOnComplete(() -> {
+                    // 发送结束标记并关闭
+                    sink.tryEmitNext(ChatResult.end());
+                    sink.tryEmitComplete();
+                })
+                .doOnError(sink::tryEmitError)
+                .subscribe();  // 启动订阅
+        return sink.asFlux();
     }
 
     private Flux<NodeOutput> getExecutionStream(String query,
@@ -164,7 +162,7 @@ public class ChatController {
                 .map(snapshot -> resumeFromCheckpoint(snapshot, query, config))
                 // 无历史状态：开始新会话
                 .orElseGet(() -> startNewConversation(query, config))
-                .doOnNext(event -> log.info("节点输出：{}", event))
+                .doOnNext(event -> log.info("节点输出：{}", event.node()))
                 .doOnError(error -> log.error("流错误：{}", error.getMessage()))
                 .doOnComplete(() -> log.info("流完成"));
     }

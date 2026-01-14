@@ -1,7 +1,7 @@
 package com.example.wx.interceptor;
 
+import lombok.Builder;
 import lombok.Data;
-import org.springframework.util.Assert;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,6 +13,7 @@ import java.nio.file.Path;
  * @create 2026/1/14 21:33
  */
 @Data
+@Builder
 public class SkillMetadata {
     private String name;
 
@@ -22,7 +23,8 @@ public class SkillMetadata {
 
     private String source;
 
-    private String fullContent;
+    @Builder.Default
+    private String fullContent = null;
 
     public String loadFullContent() throws IOException {
         if (fullContent == null) {
@@ -48,38 +50,5 @@ public class SkillMetadata {
         }
 
         return content.substring(endIndex + 3).trim();
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-        private final SkillMetadata metadata = new SkillMetadata();
-        public Builder name(String name) {
-            metadata.setName(name);
-            return this;
-        }
-
-        public Builder description(String description) {
-            metadata.description = description;
-            return this;
-        }
-
-        public Builder skillPath(String skillPath) {
-            metadata.skillPath = skillPath;
-            return this;
-        }
-
-        public Builder source(String source) {
-            metadata.source = source;
-            return this;
-        }
-        public SkillMetadata build() {
-            Assert.hasText(metadata.name, "Name must not be empty");
-            Assert.hasText(metadata.description, "Description must not be empty");
-            Assert.hasText(metadata.skillPath, "Skill path must not be empty");
-            return metadata;
-        }
     }
 }

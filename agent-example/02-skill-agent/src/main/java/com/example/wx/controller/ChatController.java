@@ -4,26 +4,21 @@ import com.alibaba.cloud.ai.graph.agent.ReactAgent;
 import com.alibaba.cloud.ai.graph.exception.GraphRunnerException;
 import com.example.wx.agent.SkillsAgent;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ChatController {
 
-    private final SkillsAgent skillsAgent;
-    private final ChatModel chatModel;
-    private ReactAgent agent;
+    private final ReactAgent agent;
 
     public ChatController(SkillsAgent skillsAgent, ChatModel chatModel) {
-        this.skillsAgent = skillsAgent;
-        this.chatModel = chatModel;
+        this.agent = skillsAgent.buildAgent(chatModel);
     }
 
     @GetMapping("/chat")
-    public String chat(String message) throws GraphRunnerException {
-            System.out.println("开始执行");
-            if (agent == null) {
-                agent = skillsAgent.buildAgent(chatModel);
-            }
-            return String.valueOf(agent.call(message));
+    public String chat(@RequestParam("message") String message) throws GraphRunnerException {
+        return String.valueOf(agent.call(message));
     }
 }

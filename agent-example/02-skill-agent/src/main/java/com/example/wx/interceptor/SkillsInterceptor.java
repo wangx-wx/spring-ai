@@ -82,7 +82,7 @@ public class SkillsInterceptor extends ModelInterceptor {
         if (StringUtils.hasText(projectSkillsDirectory)) {
             Path projectPath = Path.of(projectSkillsDirectory);
             if (Files.exists(projectPath)) {
-                List<SkillMetadata> projectSkills = skillScanner.scan(projectSkillsDirectory, "proj");
+                List<SkillMetadata> projectSkills = skillScanner.scan(projectSkillsDirectory, "project");
                 projectSkills.forEach(skill -> mergeSkills.put(skill.getName(), skill));
             }
             log.info("Loaded project skills from: {}", projectSkillsDirectory);
@@ -145,7 +145,7 @@ public class SkillsInterceptor extends ModelInterceptor {
         }
 
         sb.append("""
-                *How to Use Skills (MANDATORY Process):**
+                **How to Use Skills (MANDATORY Process):**
                 
                 When a user's request matches a skill's description, you MUST follow this process:
                 1. **Read the SKILL.md file**: Use read_file tool with the path shown above

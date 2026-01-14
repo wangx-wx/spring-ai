@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * @author wangx
@@ -27,10 +29,13 @@ import java.util.List;
 @Service
 public class SkillsAgent {
     private static final Logger logger = LoggerFactory.getLogger(SkillsAgent.class);
-    private static final String SKILLS_DIR = "agent-example/02-skill-agent/skills";
+
+    @Value("${skill.agent.skills-dir:skills}")
+    private String skillsDir;
+
     public ReactAgent buildAgent(ChatModel chatModel) {
 
-        Path skillsPath = Path.of(SKILLS_DIR).toAbsolutePath();
+        Path skillsPath = Path.of(skillsDir).toAbsolutePath();
         logger.info("Skills directory: {}", skillsPath);
 
         if (!Files.exists(skillsPath)) {
@@ -39,10 +44,8 @@ public class SkillsAgent {
         }
 
         logger.info("Skills directory exists, listing contents:");
-        try {
-            Files.list(skillsPath).forEach(p ->
-                    logger.info("  - {}", p.getFileName())
-            );
+        try (Stream<Path> paths = Files.list(skillsPath)) {
+            paths.forEach(p -> logger.info("  - {}", p.getFileName()));
         } catch (IOException e) {
             logger.error("Failed to list directory", e);
         }
@@ -58,7 +61,7 @@ public class SkillsAgent {
         tools.add(ReadFileTool.createReadFileToolCallback(ReadFileTool.DESCRIPTION));
         tools.add(WriteFileTool.createWriteFileToolCallback(WriteFileTool.DESCRIPTION));
         tools.add(ListFilesTool.createListFilesToolCallback(ListFilesTool.DESCRIPTION));
-        tools.add( ShellTool.builder(System.getProperty("user.dir"))
+        tools.add(ShellTool.builder(System.getProperty("user.dir"))
                 .build());
 
         ShellToolAgentHook hook = ShellToolAgentHook.builder()

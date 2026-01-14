@@ -13,6 +13,7 @@
     <modules>
         <module>00-flight-booking</module>
         <module>01-react-agent</module>
+        <module>02-skill-agent</module>
     </modules>
     <artifactId>agent-example</artifactId>
 
@@ -26,6 +27,10 @@
         <dependency>
             <groupId>com.example.wx</groupId>
             <artifactId>spring-boot-starter-dotenv</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
     </dependencies>
 

@@ -1,0 +1,17 @@
+server:
+  port: 10035
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: skill-agent
+
+  ai:
+    dashscope:
+      api-key: ${DASH_SCOPE_API_KEY}
+
+logging:
+  level:
+    com.example.wx.interceptor: DEBUG
+    com.example.wx.agent: DEBUG

@@ -5,19 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.example.wx</groupId>
-        <artifactId>spring-ai-ll</artifactId>
+        <artifactId>agent-example</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <packaging>pom</packaging>
-    <modules>
-        <module>00-flight-booking</module>
-        <module>01-react-agent</module>
-        <module>02-skill-agent</module>
-        <module>03-a2a-server</module>
-        <module>04-a2a-client</module>
-    </modules>
-    <artifactId>agent-example</artifactId>
+
+    <artifactId>04-a2a-client</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -27,12 +20,17 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.example.wx</groupId>
-            <artifactId>spring-boot-starter-dotenv</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba.cloud.ai</groupId>
+            <artifactId>spring-ai-alibaba-starter-a2a-nacos</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
+            <groupId>com.alibaba.cloud.ai</groupId>
+            <artifactId>spring-ai-alibaba-graph-core</artifactId>
         </dependency>
     </dependencies>
 

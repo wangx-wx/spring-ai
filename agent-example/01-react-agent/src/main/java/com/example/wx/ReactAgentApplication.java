@@ -1,12 +1,10 @@
 package com.example.wx;
 
-import com.alibaba.cloud.ai.dashscope.spec.DashScopeModel;
 import com.alibaba.cloud.ai.graph.agent.ReactAgent;
 import com.example.wx.tools.SearchTool;
 import com.example.wx.tools.WeatherTool;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.deepseek.DeepSeekAssistantMessage;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.boot.CommandLineRunner;
@@ -26,7 +24,7 @@ public class ReactAgentApplication {
         SpringApplication.run(ReactAgentApplication.class, args);
     }
 
-   @Bean
+    // @Bean
     CommandLineRunner commandLineRunner(ChatModel chatModel) {
         return args -> {
             // 创建模型实例
